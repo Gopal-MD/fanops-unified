@@ -68,7 +68,7 @@ export function FanPage() {
 
       {/* Broadcast banner */}
       {showBroadcast && (
-        <div className="sticky top-0 z-40 px-3 pt-3">
+        <div className="sticky top-0 z-40 px-3 pt-3" aria-live="assertive" role="alert">
           <div className={`glass overflow-hidden rounded-2xl bg-gradient-to-r ${bcColor} p-[1px] shadow-glow`}>
             <div className="flex items-start gap-3 rounded-2xl bg-white/95 p-3">
               <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r ${bcColor} text-white`}>

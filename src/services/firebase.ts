@@ -19,7 +19,7 @@ let _db: unknown = null;
 let _rtdb: unknown = null;
 let _storage: unknown = null;
 
-const env = typeof import.meta !== "undefined" ? (import.meta as any).env ?? {} : {};
+const env = typeof import.meta !== "undefined" ? import.meta.env ?? {} : {};
 
 const firebaseConfig = {
   apiKey: env.VITE_FIREBASE_API_KEY,
