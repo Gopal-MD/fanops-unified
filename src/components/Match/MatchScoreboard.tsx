@@ -156,12 +156,12 @@ function AskGroqWidget({ venue, lang = "English" }: { venue: string; lang?: stri
   const [busy, setBusy] = useState(false);
   const askFn = useServerFn(askGroqAssistant);
 
-  const QUICK = [
+  const QUICK = useMemo(() => [
     "Where's the nearest toilet?",
     "When does the match end?",
     "How do I get to MetLife Stadium by train?",
     "Where is the shuttle bus pickup?",
-  ];
+  ], []);
 
   const ask = async (q: string) => {
     if (!q.trim() || busy) return;
@@ -177,67 +177,60 @@ function AskGroqWidget({ venue, lang = "English" }: { venue: string; lang?: stri
       });
       setAnswer(result.answer);
     } catch {
-      setAnswer("Sorry, something went wrong. Please ask a staff member.");
+      setAnswer("Assistant temporarily unavailable.");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-black/5">
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-brand shadow-glow">
-          <MessageCircle className="h-4 w-4 text-white" />
-        </div>
-        <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-brand">AI Assistant</div>
-          <div className="text-[11px] text-muted-foreground">Powered by Groq · LLaMA 3.3 70B</div>
-        </div>
+    <div className="mt-5 rounded-3xl bg-white p-5 shadow-glow ring-1 ring-black/5" role="region" aria-label="AI Fan Assistant">
+      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand">
+        <MessageSquare className="h-4 w-4" /> AI Assistant
       </div>
+      <div className="mt-1 text-sm text-muted-foreground">Powered by Groq · LLaMA 3.3 70B</div>
 
-      {/* Quick questions */}
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-4 flex flex-wrap gap-2">
         {QUICK.map((q) => (
           <button
             key={q}
-            onClick={() => { setQuestion(q); ask(q); }}
-            disabled={busy}
-            className="rounded-full border border-border bg-secondary/50 px-3 py-1 text-[11px] font-medium text-foreground/70 transition hover:border-brand/40 hover:text-brand disabled:opacity-50"
+            onClick={() => {
+              setQuestion(q);
+              ask(q);
+            }}
+            className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-foreground transition hover:border-brand hover:text-brand"
+            aria-label={`Ask: ${q}`}
           >
             {q}
           </button>
         ))}
       </div>
 
-      {/* Input */}
-      <div className="mt-3 flex gap-2">
+      <div className="mt-4 flex items-center gap-2">
         <input
+          className="flex-1 rounded-2xl border border-border bg-secondary/50 px-4 py-3 text-sm outline-none transition focus:border-brand focus:ring-1 focus:ring-brand"
+          placeholder="Ask a question..."
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && ask(question)}
-          placeholder="Ask anything about the stadium…"
-          className="flex-1 rounded-2xl border border-border bg-secondary/40 px-4 py-2.5 text-sm outline-none transition focus:border-brand/40 focus:ring-2 focus:ring-brand/20"
+          aria-label="Ask the AI a question"
         />
         <button
           onClick={() => ask(question)}
           disabled={busy || !question.trim()}
-          className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-brand shadow-glow transition hover:-translate-y-0.5 disabled:opacity-50"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-white transition hover:scale-105 disabled:opacity-50"
+          aria-label="Send question"
         >
-          {busy
-            ? <Loader2 className="h-4 w-4 animate-spin text-white" />
-            : <Send className="h-4 w-4 text-white" />}
+          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-4 w-4" />}
         </button>
       </div>
 
-      {/* Answer */}
-      {answer && (
-        <div className="mt-3 rounded-2xl bg-gradient-brand-soft p-4">
-          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-brand">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            AI Answer
+      {(busy || answer) && (
+        <div className="mt-4 rounded-2xl bg-brand-soft p-4" aria-live="polite">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand">
+            <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" /> AI Answer
           </div>
-          <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">{answer}</p>
+          <div className="mt-2 text-sm font-medium text-foreground">{busy ? "Thinking..." : answer}</div>
         </div>
       )}
     </div>

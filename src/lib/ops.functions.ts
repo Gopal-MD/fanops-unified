@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 export interface RouteStep {
   instruction: string;
@@ -13,16 +14,27 @@ export interface RouteResult {
   accessibilityNotes: string[];
 }
 
+/**
+ * Calculates a dynamic, AI-powered accessible route through the stadium.
+ * Uses Groq LLaMA 3.3 for intelligent pathfinding based on accessibility constraints.
+ * 
+ * @param {string} data.start - The starting location (e.g., Gate A).
+ * @param {string} data.destination - The destination (e.g., Section 101).
+ * @param {boolean} data.wheelchair - Requires step-free access (elevators).
+ * @param {boolean} data.visualAssist - Requires high contrast/audio cues.
+ * @param {boolean} data.lowSensory - Requires quiet, non-congested corridors.
+ * @returns {Promise<RouteResult>} The calculated route steps and ETA.
+ */
 export const calculateRoute = createServerFn({ method: "POST" })
-  .validator(
-    (data: {
-      start: string;
-      destination: string;
-      wheelchair: boolean;
-      visualAssist: boolean;
-      lowSensory: boolean;
-    }) => data,
-  )
+  .validator((data: unknown) => {
+    return z.object({
+      start: z.string().max(100),
+      destination: z.string().max(100),
+      wheelchair: z.boolean(),
+      visualAssist: z.boolean(),
+      lowSensory: z.boolean(),
+    }).parse(data);
+  })
   .handler(async ({ data }): Promise<RouteResult> => {
     const { start, destination, wheelchair, visualAssist, lowSensory } = data;
     const key = process.env.GROQ_API_KEY;
@@ -112,15 +124,35 @@ export const calculateRoute = createServerFn({ method: "POST" })
     }
   });
 
+/**
+ * Triages an incident report using AI, falling back to local deterministic rules.
+ * @param {string} data.report - The raw text of the incident.
+ */
 export const triageIncident = createServerFn({ method: "POST" })
-  .validator((data: { report: string }) => data)
+  .validator((data: unknown) => {
+    return z.object({
+      report: z.string().max(2000), // Max 2k characters to prevent abuse
+    }).parse(data);
+  })
   .handler(async ({ data }) => {
     const { triageIncidentWithAI } = await import("./ai-gateway.server");
     return triageIncidentWithAI(data.report);
   });
 
+/**
+ * Connects fans directly to Groq LLaMA 3.3 for live match questions.
+ * @param {string} data.question - The fan's question.
+ * @param {string} data.context - Hidden context (venue, live status).
+ * @param {string} [data.lang] - The preferred language of the fan.
+ */
 export const askGroqAssistant = createServerFn({ method: "POST" })
-  .validator((data: { question: string; context: string; lang?: string }) => data)
+  .validator((data: unknown) => {
+    return z.object({
+      question: z.string().max(500), // Limit question length
+      context: z.string().max(1000),
+      lang: z.string().max(50).optional(),
+    }).parse(data);
+  })
   .handler(async ({ data }): Promise<{ answer: string }> => {
     const key = process.env.GROQ_API_KEY;
     if (!key) {

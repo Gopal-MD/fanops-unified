@@ -169,7 +169,7 @@ function FanPage() {
 
         {/* Results */}
         {routeMut.data && (
-          <div className="mt-5 space-y-4">
+          <div className="mt-5 space-y-4" aria-live="polite" aria-atomic="true">
             <div className="grid grid-cols-2 gap-3">
               <Metric icon={<Clock className="h-4 w-4" />} label="ETA" value={`${routeMut.data.etaMinutes} min`} tone="brand" />
               <Metric icon={<Ruler className="h-4 w-4" />} label="Distance" value={`${routeMut.data.distanceM} m`} tone="cyan" />
