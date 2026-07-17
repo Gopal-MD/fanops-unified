@@ -29,7 +29,7 @@ export const Route = createFileRoute("/ops")({
   component: OpsPage,
 });
 
-type Tab = "map" | "density" | "incidents" | "broadcast";
+type Tab = "map" | "density" | "incidents" | "broadcast" | "volunteers" | "sustainability";
 
 function OpsPage() {
   const [tab, setTab] = useState<Tab>("map");
@@ -44,6 +44,8 @@ function OpsPage() {
           {tab === "density" && <DensityView />}
           {tab === "incidents" && <IncidentsView />}
           {tab === "broadcast" && <BroadcastView />}
+          {tab === "volunteers" && <VolunteerView />}
+          {tab === "sustainability" && <SustainabilityView />}
         </main>
       </div>
       <ModeToggle />
@@ -59,6 +61,8 @@ function Sidebar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
     { id: "density", label: "Crowd Density", icon: Activity },
     { id: "incidents", label: "Incidents", icon: AlertTriangle },
     { id: "broadcast", label: "Broadcast", icon: Radio },
+    { id: "volunteers", label: "Volunteers", icon: Users },
+    { id: "sustainability", label: "Sustainability", icon: Sparkles },
   ];
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-border bg-white/60 backdrop-blur-xl md:block">
@@ -654,6 +658,170 @@ function BroadcastView() {
               </div>
               <div className="mt-1 text-sm font-semibold">{b.message}</div>
               <div className="mt-1 text-[11px] text-muted-foreground">{b.language}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Volunteers View ---------------- */
+
+function VolunteerView() {
+  const askFn = useServerFn(askGroqAssistant);
+  const [brief, setBrief] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const generate = async () => {
+    setLoading(true);
+    try {
+      const res = await askFn({
+        data: {
+          question: "Generate a 2-sentence shift briefing for volunteers. Focus on crowd management, hydration, and assisting fans with directions.",
+          context: "Live match at MetLife Stadium.",
+        },
+      });
+      setBrief(res.answer);
+    } catch {
+      setBrief("Unable to generate briefing.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useState(() => { generate(); });
+
+  const volunteers = [
+    { id: "v1", name: "Sarah J.", zone: "Gate A", role: "Wayfinding", status: "Active" },
+    { id: "v2", name: "Miguel O.", zone: "Section 101", role: "Seating Assist", status: "Active" },
+    { id: "v3", name: "Chen W.", zone: "Food Court North", role: "Information", status: "On Break" },
+    { id: "v4", name: "Aisha T.", zone: "Concourse East", role: "Accessibility", status: "Active" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Volunteer Management</h2>
+          <p className="text-sm text-muted-foreground">Track staff assignments and shift briefings.</p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-semibold">
+          <Users className="h-4 w-4 text-brand" /> {volunteers.length} Active
+        </div>
+      </div>
+
+      <div className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand">
+            <Sparkles className="h-4 w-4" /> AI Shift Briefing
+          </div>
+          <button onClick={generate} disabled={loading} className="text-xs font-semibold text-brand hover:underline disabled:opacity-50">Refresh</button>
+        </div>
+        <div className="mt-3 rounded-2xl bg-secondary/50 p-4 text-sm font-medium">
+          {loading ? (
+            <span className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</span>
+          ) : (
+            brief
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
+        <h3 className="text-lg font-bold">Current Assignments</h3>
+        <div className="mt-4 space-y-3">
+          {volunteers.map(v => (
+            <div key={v.id} className="flex items-center justify-between rounded-2xl border border-border p-3">
+              <div>
+                <div className="font-semibold">{v.name}</div>
+                <div className="text-[11px] text-muted-foreground">{v.role} • {v.zone}</div>
+              </div>
+              <div className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${v.status === 'Active' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                {v.status}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Sustainability View ---------------- */
+
+function SustainabilityView() {
+  const askFn = useServerFn(askGroqAssistant);
+  const [tip, setTip] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const generate = async () => {
+    setLoading(true);
+    try {
+      const res = await askFn({
+        data: {
+          question: "Give a 1-sentence quick operational tip to improve stadium sustainability right now during a live match.",
+          context: "Live match at MetLife Stadium.",
+        },
+      });
+      setTip(res.answer);
+    } catch {
+      setTip("Unable to generate tip.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useState(() => { generate(); });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Sustainability</h2>
+          <p className="text-sm text-muted-foreground">Monitor waste management and carbon impact.</p>
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-semibold">
+          <Sparkles className="h-4 w-4 text-success" /> Eco-Track Active
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <KpiCard icon={<Activity />} label="Recycling Rate" value="68%" sub="+4% from last match" tone="success" />
+        <KpiCard icon={<TrendingUp />} label="Energy Saved" value="1.2 MWh" sub="Smart lighting optimization" tone="brand" />
+      </div>
+
+      <div className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand">
+            <Sparkles className="h-4 w-4" /> AI Eco-Tip
+          </div>
+          <button onClick={generate} disabled={loading} className="text-xs font-semibold text-brand hover:underline disabled:opacity-50">Refresh</button>
+        </div>
+        <div className="mt-3 rounded-2xl bg-secondary/50 p-4 text-sm font-medium">
+          {loading ? (
+            <span className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</span>
+          ) : (
+            tip
+          )}
+        </div>
+      </div>
+
+      <div className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
+        <h3 className="text-lg font-bold">Waste Bins Status</h3>
+        <div className="mt-4 space-y-3">
+          {[
+            { id: 1, loc: "Concourse East - Bin Cluster 4", fill: 85, type: "Mixed Recycling" },
+            { id: 2, loc: "Food Court North - Bin Cluster 1", fill: 92, type: "Compost" },
+            { id: 3, loc: "Gate A - Exit Bin", fill: 30, type: "Landfill" },
+          ].map(bin => (
+            <div key={bin.id} className="flex flex-col gap-2 rounded-2xl border border-border p-3">
+              <div className="flex items-center justify-between">
+                <div className="font-semibold text-sm">{bin.loc} <span className="ml-1 text-[10px] text-muted-foreground uppercase">{bin.type}</span></div>
+                <div className={`text-xs font-bold ${bin.fill > 80 ? 'text-danger' : 'text-success'}`}>{bin.fill}% Full</div>
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                <div className={`h-full ${bin.fill > 80 ? 'bg-danger' : 'bg-success'}`} style={{ width: `${bin.fill}%` }} />
+              </div>
             </div>
           ))}
         </div>
