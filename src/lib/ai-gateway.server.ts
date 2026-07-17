@@ -1,6 +1,10 @@
-// Server-only helper for incident triage.
-// Uses Lovable AI Gateway when LOVABLE_API_KEY is set.
-// Falls back to a smart local rule-based engine when the key is absent.
+// Server-only helper for AI-powered incident triage using Groq API.
+// Groq provides ultra-fast inference (LLaMA 3.3 70B) via OpenAI-compatible API.
+//
+// Setup: Add GROQ_API_KEY to your .env file.
+// Get a free key at: https://console.groq.com/keys
+//
+// Falls back to a smart local rule-based engine when key is absent.
 
 export interface TriageResult {
   priority: "Low" | "Medium" | "High";
@@ -8,7 +12,7 @@ export interface TriageResult {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Rule-based local fallback
+// Rule-based local fallback (no API key required)
 // ─────────────────────────────────────────────────────────────────────────────
 const HIGH_KEYWORDS = [
   "unconscious", "cardiac", "collapse", "collapsed", "heart attack",
@@ -60,7 +64,6 @@ function buildActionPlan(text: string, priority: "High" | "Medium" | "Low"): str
 
 function localTriage(report: string): TriageResult {
   const text = report.toLowerCase();
-
   if (HIGH_KEYWORDS.some((kw) => text.includes(kw))) {
     return { priority: "High", actionPlan: buildActionPlan(text, "High") };
   }
@@ -71,72 +74,79 @@ function localTriage(report: string): TriageResult {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Groq API call — OpenAI-compatible endpoint, ultra-fast LLaMA inference
+// ─────────────────────────────────────────────────────────────────────────────
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL   = "llama-3.3-70b-versatile"; // ~500 tok/s on Groq
+
+async function groqTriage(report: string, key: string): Promise<TriageResult> {
+  const res = await fetch(GROQ_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0.2,
+      max_tokens: 200,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a stadium incident triage AI for a live football match. " +
+            "Classify the incident and return a concise 2-sentence action plan. " +
+            'Respond ONLY with valid JSON: {"priority":"Low"|"Medium"|"High","actionPlan":"..."}',
+        },
+        {
+          role: "user",
+          content: `Incident report: ${report}`,
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Groq API error [${res.status}]: ${body}`);
+  }
+
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content ?? "{}";
+  const parsed = JSON.parse(content);
+
+  return {
+    priority: (["Low", "Medium", "High"].includes(parsed.priority)
+      ? parsed.priority
+      : "Medium") as TriageResult["priority"],
+    actionPlan:
+      parsed.actionPlan ??
+      "Review incident and dispatch appropriate team to the location.",
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Main export
 // ─────────────────────────────────────────────────────────────────────────────
 export async function triageIncidentWithAI(report: string): Promise<TriageResult> {
-  const key = process.env.LOVABLE_API_KEY;
+  const key = process.env.GROQ_API_KEY;
 
-  // No API key → use local rule-based engine (no error thrown)
   if (!key) {
-    console.info("[AI Triage] LOVABLE_API_KEY not set — using local rule-based triage.");
+    console.info(
+      "[AI Triage] GROQ_API_KEY not set — using local rule-based triage.\n" +
+      "            Get a free key at https://console.groq.com/keys and add it to .env"
+    );
     return localTriage(report);
   }
 
-  // API key present → call Lovable AI gateway with fallback on failure
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${key}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a stadium incident triage AI. Return concise, actionable plans in exactly 2 sentences. Respond ONLY as JSON matching the schema.",
-          },
-          {
-            role: "user",
-            content: `Incident report: ${report}\n\nReturn JSON: {"priority": "Low"|"Medium"|"High", "actionPlan": "<2 sentences>"}`,
-          },
-        ],
-        response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "triage",
-            strict: true,
-            schema: {
-              type: "object",
-              additionalProperties: false,
-              properties: {
-                priority: { type: "string", enum: ["Low", "Medium", "High"] },
-                actionPlan: { type: "string" },
-              },
-              required: ["priority", "actionPlan"],
-            },
-          },
-        },
-      }),
-    });
-
-    if (!res.ok) {
-      const body = await res.text();
-      console.warn(`[AI Triage] Gateway error [${res.status}] — falling back to local triage. ${body}`);
-      return localTriage(report);
-    }
-
-    const data = await res.json();
-    const content = data.choices?.[0]?.message?.content ?? "{}";
-    const parsed = JSON.parse(content);
-    return {
-      priority: parsed.priority ?? "Medium",
-      actionPlan: parsed.actionPlan ?? "Review incident and dispatch appropriate team.",
-    };
+    console.info("[AI Triage] Calling Groq API (llama-3.3-70b-versatile)…");
+    const result = await groqTriage(report, key);
+    console.info(`[AI Triage] Groq result → priority: ${result.priority}`);
+    return result;
   } catch (err) {
-    console.warn("[AI Triage] Network error — falling back to local triage:", err);
+    console.warn("[AI Triage] Groq call failed — falling back to local triage:", err);
     return localTriage(report);
   }
 }
