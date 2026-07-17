@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Map as MapIcon, Activity, AlertTriangle, Radio, Sparkles, Loader2,
   Send, Users, TrendingUp, ShieldAlert, Home, Search, Bell, CheckCircle2, X,
@@ -11,13 +11,14 @@ import {
 } from "recharts";
 import {
   DENSITY_HISTORY, densityColor,
-  type Incident,
+  type Incident, type Zone,
 } from "@/lib/mock-data";
 import { triageIncident, askGroqAssistant } from "@/lib/ops.functions";
 import { pushBroadcast, useBroadcasts } from "@/lib/broadcast-store";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Link } from "@tanstack/react-router";
 import { useOpsStore } from "@/store/opsStore";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 export const Route = createFileRoute("/ops")({
   head: () => ({
@@ -31,8 +32,31 @@ export const Route = createFileRoute("/ops")({
 
 type Tab = "map" | "density" | "incidents" | "broadcast" | "volunteers" | "sustainability";
 
-function OpsPage() {
+export function OpsPage() {
+  const { subscribe } = useWebSocket();
+  const addIncident = useOpsStore((s) => s.addIncident);
+  const updateIncident = useOpsStore((s) => s.updateIncident);
+  const updateZone = useOpsStore((s) => s.updateZone);
   const [tab, setTab] = useState<Tab>("map");
+
+  useEffect(() => {
+    const unsubNew = subscribe("incident:new", (data) => {
+      addIncident(data as Incident);
+    });
+    const unsubUpdate = subscribe("incident:update", (data) => {
+      const incident = data as Incident;
+      updateIncident(incident.id, incident);
+    });
+    const unsubCrowd = subscribe("crowd:density-update", (data) => {
+      const zone = data as Zone;
+      updateZone(zone.id, zone);
+    });
+    return () => {
+      unsubNew();
+      unsubUpdate();
+      unsubCrowd();
+    };
+  }, [subscribe, addIncident, updateIncident, updateZone]);
 
   return (
     <div className="flex min-h-screen bg-background">

@@ -3,10 +3,11 @@ import { io, type Socket } from "socket.io-client";
 
 // Set VITE_SOCKET_URL in your .env to point at the real Socket.io server.
 // If absent, the hook silently no-ops (safe for local dev without a server).
-const SOCKET_URL =
-  typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_SOCKET_URL
-    ? (import.meta as any).env.VITE_SOCKET_URL as string
+function getSocketUrl(): string | null {
+  return typeof import.meta !== "undefined" && (import.meta as { env?: { VITE_SOCKET_URL?: string } }).env?.VITE_SOCKET_URL
+    ? (import.meta as { env: { VITE_SOCKET_URL: string } }).env.VITE_SOCKET_URL
     : null;
+}
 
 /**
  * Reusable WebSocket hook using Socket.io.
@@ -24,6 +25,7 @@ export const useWebSocket = () => {
   const connectedRef = useRef(false);
 
   useEffect(() => {
+    const SOCKET_URL = getSocketUrl();
     if (!SOCKET_URL) {
       // No server configured — skip silently
       return;

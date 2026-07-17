@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Swords, Clock, Wifi, MessageCircle, Loader2, Send } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { Swords, Clock, Wifi, MessageCircle, MessageSquare, Loader2, Send } from "lucide-react";
 import { useMatchStore, useCurrentMatch, useMatchEvents, useIsLive, type MatchEvent } from "@/store/matchStore";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useServerFn } from "@tanstack/react-start";

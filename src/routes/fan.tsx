@@ -34,7 +34,7 @@ function stepIcon(k: RouteStep["icon"]) {
     <MapPin className={cls} />;
 }
 
-function FanPage() {
+export function FanPage() {
   const [start, setStart] = useState("Gate B");
   const [dest, setDest] = useState("Section 101");
   const [wheelchair, setW] = useState(false);
