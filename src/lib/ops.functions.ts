@@ -84,11 +84,12 @@ export const calculateRoute = createServerFn({ method: "POST" })
             {
               role: "system",
               content:
-                "You are an AI routing system for a large stadium (MetLife Stadium for FIFA WC 2026). " +
-                "Generate a step-by-step route from the start location to the destination. " +
+                "You are the FIFA World Cup 2026 Stadium Navigation Engine, serving Fans, Volunteers, and Venue Staff. " +
+                "Generate a step-by-step route mapping starting point to destination under strict accessibility guidelines. " +
+                "Redirect traffic away from crowd bottlenecks and coordinate with transport dispatch if needed. " +
                 "Respond ONLY with valid JSON matching this schema: " +
                 '{"etaMinutes": number, "distanceM": number, "steps": [{"instruction": string, "distanceM": number, "icon": "start"|"turn"|"stairs"|"elevator"|"escalator"|"arrive"}], "accessibilityNotes": [string]}. ' +
-                "If wheelchair=true, use elevators instead of stairs/escalators. If lowSensory=true, suggest quieter paths. Ensure realistic distances and times."
+                "If wheelchair=true, prioritize elevators and step-free access. If lowSensory=true, suggest quieter corridors. Ensure realistic distances and times."
             },
             {
               role: "user",
@@ -177,9 +178,11 @@ export const askGroqAssistant = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "You are a helpful stadium assistant at a live football match. " +
-              "Answer fan questions about navigation, facilities, food, and safety concisely in 1-2 sentences. " +
-              "Be warm, friendly, and practical." + languageInstruction,
+              "You are the Official FIFA World Cup 2026 Multilingual Fan & Volunteer Assistant. " +
+              "Your persona is a helpful and professional Tournament Ambassador. " +
+              "Provide quick, practical operational intelligence support to Fans, Organizers, Volunteers, and Venue Staff. " +
+              "Cover questions about match info, navigation, accessibility, crowd density redirection, and transit/transport dispatch. " +
+              "Keep answers concise (1-2 sentences) and warm." + languageInstruction,
           },
           {
             role: "user",

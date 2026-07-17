@@ -18,23 +18,15 @@ This project is built specifically for **Challenge 4: Smart Stadiums & Tournamen
 
 > Build a GenAI-enabled solution that enhances stadium operations and the overall tournament experience for fans, organizers, volunteers, or venue staff during the FIFA World Cup 2026.
 
-Here is how FanOps Unified directly maps to each objective:
+Here is our high-fidelity alignment matrix mapping the FIFA World Cup 2026 objectives, target personas, and AI prompt vectors:
 
-- **Fan Navigation & Wayfinding** 🗺️
-  - **AI-Powered Accessible Routing**: Uses Groq LLaMA 3.3 to generate dynamic, step-by-step navigation paths through the stadium tailored to specific accessibility needs — wheelchair routes (elevator-only), low-sensory paths (quiet corridors), and high-contrast visual assistance modes.
-
-- **Crowd Management** 📊
-  - **Real-Time Density Heatmap**: Live crowd density visualization across all stadium zones (Gates A–D, Sections, Concourses, Food Courts) with occupancy percentages and automatic congestion alerts.
-  - **AI Incident Triage**: Incident reports are automatically classified by severity (High/Medium/Low) and paired with a 2-sentence AI-generated action plan dispatched to the nearest available staff.
-
-- **Multilingual Assistance** 🗣️
-  - **AI Fan Assistant**: Context-aware chatbot powered by Groq (LLaMA 3.3 70B) that answers live stadium queries in the fan's native language in milliseconds — covering directions, transport, match info, and accessibility.
-
-- **Sustainability** ♻️
-  - **Eco-Operations Dashboard**: Live tracking of recycling rates, energy savings, and waste bin fill levels across the stadium. AI dynamically generates shift eco-tips for operational staff.
-
-- **Volunteer Management** 👥
-  - **Volunteer Command View**: Real-time tracking of volunteer positions, roles, and statuses (Active/On Break) with AI-generated shift briefings based on live match context.
+| Challenge Domain | FIFA 2026 Problem Statement | GenAI Unified Solution (LLaMA 3.3) | Target Personas | Operational Prompt Vectors |
+| :--- | :--- | :--- | :--- | :--- |
+| **Fan Navigation & Wayfinding** 🗺️ | Static, congested routes lead to delays. Wheelchair users, low-sensory fans, and visually impaired individuals lack tailored paths. | **AI-Powered Accessible Routing**: Generates step-free, visual-assist, or low-sensory paths in real-time, redirecting fans away from live bottlenecks. | Fans, Volunteers, Venue Staff | Crowd density redirection, step-free lifts prioritization, quiet sensory corridors. |
+| **Crowd Management & Operations** 📊 | Manual incident dispatch is too slow during matches. Organizers lack instant triage for crowd incidents. | **AI Incident Triage**: Instantly categorizes incident reports (High/Medium/Low) and returns a 2-sentence tactical dispatch plan in <800ms. | Organizers, Volunteers, Venue Staff | Operational intelligence support, security command, medical guidance. |
+| **Multilingual Assistance** 🗣️ | A global fan base creates major language barriers. Volunteers are overwhelmed with inquiries. | **Multilingual AI Fan Assistant**: Instant chatbot answers questions about navigation, stadium rules, and safety in the fan's native language. | Fans, Volunteers | Real-time multi-lingual crowd support, transit/transport dispatch info. |
+| **Sustainability & Eco-Ops** ♻️ | Static waste/recycling tracking. Stadium staff lack actionable operational guides for eco-targets. | **Eco-Operations Dashboard**: Live bin level monitoring with AI-generated, shift-contextual eco-tips to optimize waste diversion. | Organizers, Venue Staff | Operational intelligence support, resource optimization. |
+| **Volunteer Management** 👥 | Poor communication of real-time match details and safety protocols to thousands of stadium volunteers. | **Volunteer Command View**: Displays volunteer locations and live statuses with AI-generated shift briefings matching crowd density. | Organizers, Volunteers | Real-time crowd management, volunteer briefings. |
 
 ---
 
