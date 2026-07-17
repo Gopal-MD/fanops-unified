@@ -15,7 +15,7 @@ import { MatchScoreboard } from "@/components/Match/MatchScoreboard";
 export const Route = createFileRoute("/fan")({
   head: () => ({
     meta: [
-      { title: "Fan PWA — MatchDay Command" },
+      { title: "Fan PWA — FIFA World Cup 2026" },
       { name: "description", content: "Find your way, get real-time alerts, arrive comfortably." },
     ],
   }),
@@ -101,7 +101,7 @@ function FanPage() {
         <div className="flex items-center justify-between text-white">
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-widest opacity-80">
-              MatchDay Command
+              FIFA WC 2026
             </div>
             <h1 className="text-2xl font-bold">Hey, Fan 👋</h1>
           </div>
@@ -214,7 +214,7 @@ function FanPage() {
         )}
 
         {/* Live Match Scoreboard */}
-        <MatchScoreboard />
+        <MatchScoreboard lang={lang} />
       </div>
 
       <ModeToggle />

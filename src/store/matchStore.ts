@@ -38,10 +38,10 @@ interface MatchStore {
 
 // Default mock match for demonstration
 const DEFAULT_MATCH: Match = {
-  id: "match-001",
-  homeTeam: { name: "Mumbai City FC", score: 2, logo: "🔵" },
-  awayTeam: { name: "Bengaluru FC", score: 1, logo: "🔴" },
-  venue: "MatchDay Stadium",
+  id: "match-wc-01",
+  homeTeam: { name: "USA", score: 2, logo: "🇺🇸" },
+  awayTeam: { name: "Mexico", score: 1, logo: "🇲🇽" },
+  venue: "MetLife Stadium",
   kickoffTime: new Date().toISOString(),
   status: "live",
   minute: 67,
@@ -49,11 +49,11 @@ const DEFAULT_MATCH: Match = {
 
 const DEFAULT_EVENTS: MatchEvent[] = [
   { id: "ev-1", type: "kickoff", team: "home", minute: 0, timestamp: Date.now() - 67 * 60000 },
-  { id: "ev-2", type: "goal", team: "home", player: "Rahul Singh", minute: 23, timestamp: Date.now() - 44 * 60000 },
-  { id: "ev-3", type: "goal", team: "away", player: "Sunil Chhetri", minute: 38, timestamp: Date.now() - 29 * 60000 },
+  { id: "ev-2", type: "goal", team: "home", player: "Christian Pulisic", minute: 23, timestamp: Date.now() - 44 * 60000 },
+  { id: "ev-3", type: "goal", team: "away", player: "Santiago Giménez", minute: 38, timestamp: Date.now() - 29 * 60000 },
   { id: "ev-4", type: "halftime", team: "home", minute: 45, timestamp: Date.now() - 22 * 60000 },
-  { id: "ev-5", type: "goal", team: "home", player: "Igor Angulo", minute: 55, timestamp: Date.now() - 12 * 60000 },
-  { id: "ev-6", type: "card", team: "away", player: "Fran Gonzalez", minute: 62, timestamp: Date.now() - 5 * 60000 },
+  { id: "ev-5", type: "goal", team: "home", player: "Folarin Balogun", minute: 55, timestamp: Date.now() - 12 * 60000 },
+  { id: "ev-6", type: "card", team: "away", player: "Edson Álvarez", minute: 62, timestamp: Date.now() - 5 * 60000 },
 ];
 
 export const useMatchStore = create<MatchStore>()(

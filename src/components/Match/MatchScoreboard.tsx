@@ -9,7 +9,7 @@ import { askGroqAssistant } from "@/lib/ops.functions";
  * Live match scoreboard + Groq-powered fan Q&A assistant.
  * Wired to useMatchStore + useWebSocket.
  */
-export function MatchScoreboard() {
+export function MatchScoreboard({ lang = "English" }: { lang?: string }) {
   const match = useCurrentMatch();
   const events = useMatchEvents();
   const isLive = useIsLive();
@@ -121,7 +121,7 @@ export function MatchScoreboard() {
       </div>
 
       {/* ── Groq AI Fan Assistant ──────────────────────────────────────── */}
-      <AskGroqWidget venue={match.venue} />
+      <AskGroqWidget venue={match.venue} lang={lang} />
     </div>
   );
 }
@@ -150,7 +150,7 @@ function EventRow({ event }: { event: MatchEvent }) {
 }
 
 /* ── Groq AI Ask Widget ───────────────────────────────────────────────────── */
-function AskGroqWidget({ venue }: { venue: string }) {
+function AskGroqWidget({ venue, lang = "English" }: { venue: string; lang?: string }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -159,8 +159,8 @@ function AskGroqWidget({ venue }: { venue: string }) {
   const QUICK = [
     "Where's the nearest toilet?",
     "When does the match end?",
-    "Where can I get food?",
-    "Is Gate B open?",
+    "How do I get to MetLife Stadium by train?",
+    "Where is the shuttle bus pickup?",
   ];
 
   const ask = async (q: string) => {
@@ -171,7 +171,8 @@ function AskGroqWidget({ venue }: { venue: string }) {
       const result = await askFn({
         data: {
           question: q.trim(),
-          context: `Venue: ${venue}. Match is currently live.`,
+          context: `Venue: ${venue}. Match is currently live. Transport info: Nearest train is Meadowlands Rail Station. Free shuttle buses available at Lot C.`,
+          lang: lang,
         },
       });
       setAnswer(result.answer);

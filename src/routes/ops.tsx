@@ -22,7 +22,7 @@ import { useOpsStore } from "@/store/opsStore";
 export const Route = createFileRoute("/ops")({
   head: () => ({
     meta: [
-      { title: "Ops Dashboard — MatchDay Command" },
+      { title: "Ops Command — FIFA World Cup 2026" },
       { name: "description", content: "Stadium operations: crowd density, incidents, broadcast center." },
     ],
   }),
@@ -67,8 +67,8 @@ function Sidebar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
-          <div className="text-sm font-extrabold leading-none">MatchDay</div>
-          <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Command</div>
+          <div className="text-sm font-extrabold leading-none">FIFA 26</div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Operations</div>
         </div>
       </div>
       <nav className="mt-4 space-y-1 px-3">
