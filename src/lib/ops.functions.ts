@@ -14,7 +14,7 @@ export interface RouteResult {
 }
 
 export const calculateRoute = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     (data: {
       start: string;
       destination: string;
@@ -52,8 +52,51 @@ export const calculateRoute = createServerFn({ method: "POST" })
   });
 
 export const triageIncident = createServerFn({ method: "POST" })
-  .inputValidator((data: { report: string }) => data)
+  .validator((data: { report: string }) => data)
   .handler(async ({ data }) => {
     const { triageIncidentWithAI } = await import("./ai-gateway.server");
     return triageIncidentWithAI(data.report);
+  });
+
+export const askGroqAssistant = createServerFn({ method: "POST" })
+  .validator((data: { question: string; context: string }) => data)
+  .handler(async ({ data }): Promise<{ answer: string }> => {
+    const key = process.env.GROQ_API_KEY;
+    if (!key) {
+      return { answer: "AI assistant unavailable — GROQ_API_KEY not configured." };
+    }
+
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.4,
+        max_tokens: 150,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful stadium assistant at a live football match. " +
+              "Answer fan questions about navigation, facilities, food, and safety concisely in 1-2 sentences. " +
+              "Be warm, friendly, and practical.",
+          },
+          {
+            role: "user",
+            content: `Context: ${data.context}\n\nFan question: ${data.question}`,
+          },
+        ],
+      }),
+    });
+
+    if (!res.ok) {
+      return { answer: "Sorry, I couldn't fetch an answer right now. Please ask a staff member for help." };
+    }
+
+    const json = await res.json();
+    const answer = json.choices?.[0]?.message?.content?.trim() ?? "I'm not sure — please ask nearby staff.";
+    return { answer };
   });
