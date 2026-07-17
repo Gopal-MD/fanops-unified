@@ -24,9 +24,7 @@ export const useOpsStore = create<OpsStore>()((set) => ({
 
   updateIncident: (id, patch) =>
     set((state) => ({
-      incidents: state.incidents.map((inc) =>
-        inc.id === id ? { ...inc, ...patch } : inc
-      ),
+      incidents: state.incidents.map((inc) => (inc.id === id ? { ...inc, ...patch } : inc)),
     })),
 
   deleteIncident: (id) =>

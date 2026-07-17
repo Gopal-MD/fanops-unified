@@ -4,7 +4,8 @@ import { io, type Socket } from "socket.io-client";
 // Set VITE_SOCKET_URL in your .env to point at the real Socket.io server.
 // If absent, the hook silently no-ops (safe for local dev without a server).
 function getSocketUrl(): string | null {
-  return typeof import.meta !== "undefined" && (import.meta as { env?: { VITE_SOCKET_URL?: string } }).env?.VITE_SOCKET_URL
+  return typeof import.meta !== "undefined" &&
+    (import.meta as { env?: { VITE_SOCKET_URL?: string } }).env?.VITE_SOCKET_URL
     ? (import.meta as { env: { VITE_SOCKET_URL: string } }).env.VITE_SOCKET_URL
     : null;
 }
@@ -31,8 +32,7 @@ export const useWebSocket = () => {
       return;
     }
 
-    const token =
-      typeof localStorage !== "undefined" ? localStorage.getItem("authToken") : null;
+    const token = typeof localStorage !== "undefined" ? localStorage.getItem("authToken") : null;
 
     socketRef.current = io(SOCKET_URL, {
       reconnection: true,
@@ -67,15 +67,12 @@ export const useWebSocket = () => {
    * Subscribe to a WebSocket event.
    * Returns an unsubscribe function — use it in useEffect cleanup.
    */
-  const subscribe = useCallback(
-    (event: string, callback: (data: unknown) => void) => {
-      socketRef.current?.on(event, callback);
-      return () => {
-        socketRef.current?.off(event, callback);
-      };
-    },
-    []
-  );
+  const subscribe = useCallback((event: string, callback: (data: unknown) => void) => {
+    socketRef.current?.on(event, callback);
+    return () => {
+      socketRef.current?.off(event, callback);
+    };
+  }, []);
 
   /**
    * Emit an event to the server.

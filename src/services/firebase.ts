@@ -19,7 +19,7 @@ let _db: unknown = null;
 let _rtdb: unknown = null;
 let _storage: unknown = null;
 
-const env = typeof import.meta !== "undefined" ? import.meta.env ?? {} : {};
+const env = import.meta.env;
 
 const firebaseConfig = {
   apiKey: env.VITE_FIREBASE_API_KEY,
@@ -36,7 +36,7 @@ const isConfigured = Object.values(firebaseConfig).every(Boolean);
 if (!isConfigured) {
   console.warn(
     "[Firebase] Missing env vars — Firebase features are disabled.\n" +
-    "Add VITE_FIREBASE_* variables to your .env file to enable."
+      "Add VITE_FIREBASE_* variables to your .env file to enable.",
   );
 } else {
   // Dynamically import Firebase only when configured to avoid

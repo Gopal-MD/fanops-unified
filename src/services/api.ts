@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -70,22 +70,18 @@ export const orderAPI = {
 // Ops API
 // ─────────────────────────────────────────────────────────────────────────────
 export const opsAPI = {
-  getIncidents: (matchId: string) =>
-    apiClient.get(`/ops/incidents?match=${matchId}`),
-  reportIncident: (data: Record<string, unknown>) =>
-    apiClient.post("/ops/incidents", data),
+  getIncidents: (matchId: string) => apiClient.get(`/ops/incidents?match=${matchId}`),
+  reportIncident: (data: Record<string, unknown>) => apiClient.post("/ops/incidents", data),
   updateIncident: (id: string, data: Record<string, unknown>) =>
     apiClient.put(`/ops/incidents/${id}`, data),
-  getCrowdStatus: (matchId: string) =>
-    apiClient.get(`/ops/crowd-status?match=${matchId}`),
+  getCrowdStatus: (matchId: string) => apiClient.get(`/ops/crowd-status?match=${matchId}`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth API
 // ─────────────────────────────────────────────────────────────────────────────
 export const authAPI = {
-  login: (email: string, password: string) =>
-    apiClient.post("/auth/login", { email, password }),
+  login: (email: string, password: string) => apiClient.post("/auth/login", { email, password }),
   logout: () => apiClient.post("/auth/logout"),
   refresh: () => apiClient.post("/auth/refresh"),
   me: () => apiClient.get("/auth/me"),

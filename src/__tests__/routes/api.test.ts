@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 // Mock the server functions in ops.functions to isolate API route logic
 vi.mock("@/lib/ops.functions", () => ({
@@ -17,15 +17,20 @@ vi.mock("@/lib/ops.functions", () => ({
   }),
 }));
 
+// Helper function to safely extract typecast server handlers in tests
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getHandlers = (route: any) => {
+  return route.options.server!.handlers!;
+};
+
 describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
-  
   // ─── Healthz / Health check route ──────────────────────────────────────────
   describe("GET /api/healthz", () => {
     it("returns success: true and data: status OK in standard API contract", async () => {
       const { Route } = await import("../../routes/api/healthz");
       const request = new Request("http://localhost/api/healthz");
-      
-      const response = await Route.options.server!.handlers!.GET!({ request });
+
+      const response = await getHandlers(Route).GET({ request });
       const body = await response.json();
 
       expect(response.status).toBe(200);
@@ -44,7 +49,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
       const { Route } = await import("../../routes/api/system");
       const request = new Request("http://localhost/api/system");
 
-      const response = await Route.options.server!.handlers!.GET!({ request });
+      const response = await getHandlers(Route).GET({ request });
       const body = await response.json();
 
       expect(response.status).toBe(200);
@@ -61,7 +66,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
       const { Route } = await import("../../routes/api/stadium");
       const request = new Request("http://localhost/api/stadium?action=density");
 
-      const response = await Route.options.server!.handlers!.GET!({ request });
+      const response = await getHandlers(Route).GET({ request });
       const body = await response.json();
 
       expect(response.status).toBe(200);
@@ -75,7 +80,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
       const { Route } = await import("../../routes/api/stadium");
       const request = new Request("http://localhost/api/stadium?action=invalid");
 
-      const response = await Route.options.server!.handlers!.GET!({ request });
+      const response = await getHandlers(Route).GET({ request });
       const body = await response.json();
 
       expect(response.status).toBe(400);
@@ -99,7 +104,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
         }),
       });
 
-      const response = await Route.options.server!.handlers!.POST!({ request });
+      const response = await getHandlers(Route).POST({ request });
       const body = await response.json();
 
       expect(response.status).toBe(200);
@@ -119,7 +124,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
         }),
       });
 
-      const response = await Route.options.server!.handlers!.POST!({ request });
+      const response = await getHandlers(Route).POST({ request });
       const body = await response.json();
 
       expect(response.status).toBe(400);
@@ -139,7 +144,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
         }),
       });
 
-      const response = await Route.options.server!.handlers!.POST!({ request });
+      const response = await getHandlers(Route).POST({ request });
       const body = await response.json();
 
       expect(response.status).toBe(200);
@@ -162,7 +167,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
         }),
       });
 
-      const response = await Route.options.server!.handlers!.POST!({ request });
+      const response = await getHandlers(Route).POST({ request });
       const body = await response.json();
 
       expect(response.status).toBe(200);
@@ -181,7 +186,7 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
         }),
       });
 
-      const response = await Route.options.server!.handlers!.POST!({ request });
+      const response = await getHandlers(Route).POST({ request });
       const body = await response.json();
 
       expect(response.status).toBe(400);

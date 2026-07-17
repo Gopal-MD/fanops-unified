@@ -36,8 +36,24 @@ export const ZONES: Zone[] = [
   { id: "gD", name: "Gate D", capacity: 5000, occupancy: 31, level: "low", x: 15, y: 78 },
   { id: "s101", name: "Section 101", capacity: 1200, occupancy: 74, level: "medium", x: 35, y: 45 },
   { id: "s205", name: "Section 205", capacity: 1200, occupancy: 92, level: "high", x: 65, y: 45 },
-  { id: "food", name: "Food Court North", capacity: 800, occupancy: 58, level: "medium", x: 50, y: 15 },
-  { id: "conc", name: "Concourse East", capacity: 2000, occupancy: 71, level: "medium", x: 70, y: 60 },
+  {
+    id: "food",
+    name: "Food Court North",
+    capacity: 800,
+    occupancy: 58,
+    level: "medium",
+    x: 50,
+    y: 15,
+  },
+  {
+    id: "conc",
+    name: "Concourse East",
+    capacity: 2000,
+    occupancy: 71,
+    level: "medium",
+    x: 70,
+    y: 60,
+  },
 ];
 
 export const INITIAL_INCIDENTS: Incident[] = [
@@ -67,7 +83,8 @@ export const INITIAL_INCIDENTS: Incident[] = [
     reportedAt: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
     status: "in-progress",
     priority: "High",
-    actionPlan: "Secure 15m perimeter. Alert K9 unit and security lead. Verify with adjacent cameras.",
+    actionPlan:
+      "Secure 15m perimeter. Alert K9 unit and security lead. Verify with adjacent cameras.",
   },
   {
     id: "inc-4",
@@ -77,7 +94,8 @@ export const INITIAL_INCIDENTS: Incident[] = [
     reportedAt: new Date(Date.now() - 1000 * 60 * 22).toISOString(),
     status: "resolved",
     priority: "Medium",
-    actionPlan: "Escort to guest services. Announce over PA (English + Spanish). Reunite with guardian.",
+    actionPlan:
+      "Escort to guest services. Announce over PA (English + Spanish). Reunite with guardian.",
   },
 ];
 

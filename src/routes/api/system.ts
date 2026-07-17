@@ -21,15 +21,18 @@ export const Route = createFileRoute("/api/system")({
             environment: process.env.NODE_ENV || "development",
             version: "1.0.0",
           };
-          
+
           // Guard clause: ensure system is operational
           if (!metrics.status) {
             return createErrorResponse("System status is degraded", 503);
           }
 
           return createSuccessResponse(metrics);
-        } catch (error: any) {
-          return createErrorResponse(error?.message || "Internal server error", 500);
+        } catch (error: unknown) {
+          return createErrorResponse(
+            error instanceof Error ? error.message : "Internal server error",
+            500,
+          );
         }
       },
     },

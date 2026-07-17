@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [
     tanstackStart({
-      server: { entry: "src/server.ts" }
+      server: { entry: "src/server.ts" },
     }),
     tsconfigPaths(),
     tailwindcss(),
@@ -14,5 +14,5 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-  }
+  },
 });

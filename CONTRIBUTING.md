@@ -23,7 +23,7 @@ Thank you for choosing to contribute to FanOps Unified! We appreciate your suppo
 
 ## Code Quality Standards
 
-*   All async operations must include structured try-catch error boundary handling.
-*   Enforce the unified API JSON Contract: `{ success, data, error }`.
-*   Maintain clean, modular components under `src/components/` and server helpers under `src/lib/`.
-*   All tests must mock external network calls (such as Groq or Maps APIs).
+- All async operations must include structured try-catch error boundary handling.
+- Enforce the unified API JSON Contract: `{ success, data, error }`.
+- Maintain clean, modular components under `src/components/` and server helpers under `src/lib/`.
+- All tests must mock external network calls (such as Groq or Maps APIs).

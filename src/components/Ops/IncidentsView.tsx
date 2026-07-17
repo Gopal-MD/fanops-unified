@@ -12,12 +12,7 @@ interface IncidentCardProps {
   onMove: (s: Incident["status"]) => void;
 }
 
-function IncidentCard({
-  inc,
-  busy,
-  onTriage,
-  onMove,
-}: IncidentCardProps) {
+function IncidentCard({ inc, busy, onTriage, onMove }: IncidentCardProps) {
   const priColor =
     inc.priority === "High"
       ? "bg-danger"
@@ -41,11 +36,17 @@ function IncidentCard({
         <div className="min-w-0 flex-1">
           <div className="text-sm font-bold leading-snug">{inc.title}</div>
           <div className="mt-0.5 text-[11px] text-muted-foreground">
-            📍 {inc.location} · {new Date(inc.reportedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            📍 {inc.location} ·{" "}
+            {new Date(inc.reportedAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </div>
         </div>
         {inc.priority && (
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white ${priColor}`}>
+          <span
+            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase text-white ${priColor}`}
+          >
             {inc.priority}
           </span>
         )}
@@ -67,7 +68,11 @@ function IncidentCard({
           disabled={busy}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-brand px-3 py-2 text-xs font-bold text-white shadow-glow transition hover:-translate-y-0.5 disabled:opacity-60"
         >
-          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+          {busy ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5" />
+          )}
           AI Triage
         </button>
         {nxt && (
@@ -90,7 +95,7 @@ export function IncidentsView() {
   const { incidents: items, updateIncident: storeUpdate } = useOpsStore();
   const setItems = (updater: (xs: Incident[]) => Incident[]) =>
     updater(items).forEach((inc) => storeUpdate(inc.id, inc));
-  
+
   const triage = useServerFn(triageIncident);
   const [busyId, setBusy] = useState<string | null>(null);
 
@@ -111,7 +116,12 @@ export function IncidentsView() {
       setItems((xs) =>
         xs.map((x) =>
           x.id === inc.id
-            ? { ...x, priority: result.priority, actionPlan: result.actionPlan, status: x.status === "new" ? "triaged" : x.status }
+            ? {
+                ...x,
+                priority: result.priority,
+                actionPlan: result.actionPlan,
+                status: x.status === "new" ? "triaged" : x.status,
+              }
             : x,
         ),
       );
@@ -128,21 +138,25 @@ export function IncidentsView() {
       {columns.map((col) => (
         <div key={col.id} className="rounded-3xl bg-white/60 p-4 ring-1 ring-border">
           <div className="mb-3 flex items-center justify-between px-1">
-            <div className={`text-xs font-bold uppercase tracking-widest ${col.tone}`}>{col.label}</div>
+            <div className={`text-xs font-bold uppercase tracking-widest ${col.tone}`}>
+              {col.label}
+            </div>
             <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-muted-foreground ring-1 ring-border">
               {items.filter((i) => i.status === col.id).length}
             </span>
           </div>
           <div className="space-y-3">
-            {items.filter((i) => i.status === col.id).map((inc) => (
-              <IncidentCard
-                key={inc.id}
-                inc={inc}
-                busy={busyId === inc.id}
-                onTriage={() => runTriage(inc)}
-                onMove={(s) => move(inc.id, s)}
-              />
-            ))}
+            {items
+              .filter((i) => i.status === col.id)
+              .map((inc) => (
+                <IncidentCard
+                  key={inc.id}
+                  inc={inc}
+                  busy={busyId === inc.id}
+                  onTriage={() => runTriage(inc)}
+                  onMove={(s) => move(inc.id, s)}
+                />
+              ))}
             {items.filter((i) => i.status === col.id).length === 0 && (
               <div className="rounded-2xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
                 No incidents

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 const eventHandlers = new Map<string, Set<(data: unknown) => void>>();
 
@@ -17,7 +17,7 @@ const mockSocket = {
   disconnect: vi.fn(),
 };
 
-vi.mock('socket.io-client', () => ({
+vi.mock("socket.io-client", () => ({
   io: vi.fn(() => mockSocket),
 }));
 
@@ -25,35 +25,42 @@ function simulateEvent(event: string, data: unknown) {
   eventHandlers.get(event)?.forEach((cb) => cb(data));
 }
 
-describe('useWebSocket integration', () => {
+describe("useWebSocket integration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     eventHandlers.clear();
   });
 
-  it('delivers match:goal events to subscribers', () => {
+  it("delivers match:goal events to subscribers", () => {
     const { result } = renderHook(() => useWebSocket());
     const callback = vi.fn();
 
     act(() => {
-      result.current.subscribe('match:goal', callback);
+      result.current.subscribe("match:goal", callback);
     });
 
-    const mockData = { id: 'ev-99', type: 'goal', team: 'home', player: 'Test Player', minute: 45, timestamp: Date.now() };
+    const mockData = {
+      id: "ev-99",
+      type: "goal",
+      team: "home",
+      player: "Test Player",
+      minute: 45,
+      timestamp: Date.now(),
+    };
     act(() => {
-      simulateEvent('match:goal', mockData);
+      simulateEvent("match:goal", mockData);
     });
 
     expect(callback).toHaveBeenCalledWith(mockData);
   });
 
-  it('unsubscribes from events on cleanup', () => {
+  it("unsubscribes from events on cleanup", () => {
     const { result, unmount } = renderHook(() => useWebSocket());
     const callback = vi.fn();
 
     let unsub: () => void;
     act(() => {
-      unsub = result.current.subscribe('match:goal', callback);
+      unsub = result.current.subscribe("match:goal", callback);
     });
 
     act(() => {
@@ -61,7 +68,7 @@ describe('useWebSocket integration', () => {
     });
 
     act(() => {
-      simulateEvent('match:goal', { player: 'Should not fire' });
+      simulateEvent("match:goal", { player: "Should not fire" });
     });
 
     expect(callback).not.toHaveBeenCalled();
@@ -69,18 +76,18 @@ describe('useWebSocket integration', () => {
     expect(mockSocket.disconnect).toHaveBeenCalled();
   });
 
-  it('supports multiple event types independently', () => {
+  it("supports multiple event types independently", () => {
     const { result } = renderHook(() => useWebSocket());
     const goalCb = vi.fn();
     const cardCb = vi.fn();
 
     act(() => {
-      result.current.subscribe('match:goal', goalCb);
-      result.current.subscribe('match:card', cardCb);
+      result.current.subscribe("match:goal", goalCb);
+      result.current.subscribe("match:card", cardCb);
     });
 
     act(() => {
-      simulateEvent('match:card', { type: 'card', minute: 30 });
+      simulateEvent("match:card", { type: "card", minute: 30 });
     });
 
     expect(cardCb).toHaveBeenCalledTimes(1);

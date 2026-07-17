@@ -10,7 +10,10 @@
  */
 
 export class PaymentError extends Error {
-  constructor(message: string, public readonly gateway = "razorpay") {
+  constructor(
+    message: string,
+    public readonly gateway = "razorpay",
+  ) {
     super(message);
     this.name = "PaymentError";
   }
@@ -32,7 +35,7 @@ export interface PaymentResult {
 export const processPayment = async (
   orderId: string,
   amount: number,
-  paymentMethod: "razorpay" | "stripe" = "razorpay"
+  paymentMethod: "razorpay" | "stripe" = "razorpay",
 ): Promise<PaymentResult> => {
   if (paymentMethod === "razorpay") {
     // Stub: replace with real Razorpay SDK call when credentials are available
@@ -54,7 +57,9 @@ export const processPayment = async (
     try {
       // Dynamic import so the app doesn't crash when razorpay is not installed
       const Razorpay = (await import("razorpay" as never)).default as {
-        new(opts: Record<string, string>): { orders: { create(opts: Record<string, unknown>): Promise<{ id: string }> } }
+        new (opts: Record<string, string>): {
+          orders: { create(opts: Record<string, unknown>): Promise<{ id: string }> };
+        };
       };
       const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
 
@@ -87,10 +92,9 @@ export const processPayment = async (
  */
 export const handleRazorpayWebhook = async (
   payload: Record<string, unknown>,
-  onConfirmed: (orderId: string) => Promise<void>
+  onConfirmed: (orderId: string) => Promise<void>,
 ) => {
-  const payment = (payload?.payload as Record<string, unknown>)
-    ?.payment as Record<string, unknown>;
+  const payment = (payload?.payload as Record<string, unknown>)?.payment as Record<string, unknown>;
   const entity = payment?.entity as Record<string, unknown>;
 
   if (!entity?.receipt) {

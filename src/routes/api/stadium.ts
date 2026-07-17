@@ -21,7 +21,7 @@ const TriageSchema = z.object({
  * - POST /api/stadium?action=route -> Calculates AI-powered accessible routing.
  * - POST /api/stadium?action=triage -> Triages incidents using AI.
  * - GET /api/stadium?action=density -> Fetches crowd density mock metrics.
- * 
+ *
  * Personas: Fans, Organizers, Volunteers, Venue Staff.
  */
 export const Route = createFileRoute("/api/stadium")({
@@ -41,17 +41,35 @@ export const Route = createFileRoute("/api/stadium")({
           const densityData = {
             stadium: "MetLife Stadium (FIFA WC 2026)",
             zones: [
-              { id: "gate-a", name: "Gate A (Concourse)", occupancyPercentage: 84, status: "Critical" },
+              {
+                id: "gate-a",
+                name: "Gate A (Concourse)",
+                occupancyPercentage: 84,
+                status: "Critical",
+              },
               { id: "gate-b", name: "Gate B (Entry)", occupancyPercentage: 42, status: "Normal" },
-              { id: "section-101", name: "Section 101 (Seats)", occupancyPercentage: 92, status: "Critical" },
-              { id: "food-court-west", name: "Food Court West", occupancyPercentage: 65, status: "Warning" },
+              {
+                id: "section-101",
+                name: "Section 101 (Seats)",
+                occupancyPercentage: 92,
+                status: "Critical",
+              },
+              {
+                id: "food-court-west",
+                name: "Food Court West",
+                occupancyPercentage: 65,
+                status: "Warning",
+              },
             ],
             timestamp: new Date().toISOString(),
           };
 
           return createSuccessResponse(densityData);
-        } catch (error: any) {
-          return createErrorResponse(error?.message || "Internal server error", 500);
+        } catch (error: unknown) {
+          return createErrorResponse(
+            error instanceof Error ? error.message : "Internal server error",
+            500,
+          );
         }
       },
 
@@ -94,8 +112,11 @@ export const Route = createFileRoute("/api/stadium")({
 
           // Guard Clause: fallthrough for invalid actions
           return createErrorResponse(`Unsupported action: ${action}`, 400);
-        } catch (error: any) {
-          return createErrorResponse(error?.message || "Internal server error", 500);
+        } catch (error: unknown) {
+          return createErrorResponse(
+            error instanceof Error ? error.message : "Internal server error",
+            500,
+          );
         }
       },
     },

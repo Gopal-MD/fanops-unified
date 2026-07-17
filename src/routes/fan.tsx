@@ -3,9 +3,24 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
-  MapPin, Navigation, Accessibility, Eye, Volume2, Loader2,
-  ArrowRight, Footprints, ArrowUp, Flag, ChevronsRight, ArrowUpFromLine,
-  Bell, X, Sparkles, Clock, Ruler, Languages,
+  MapPin,
+  Navigation,
+  Accessibility,
+  Eye,
+  Volume2,
+  Loader2,
+  ArrowRight,
+  Footprints,
+  ArrowUp,
+  Flag,
+  ChevronsRight,
+  ArrowUpFromLine,
+  Bell,
+  X,
+  Sparkles,
+  Clock,
+  Ruler,
+  Languages,
 } from "lucide-react";
 import { calculateRoute, type RouteResult, type RouteStep } from "@/lib/ops.functions";
 import { useLatestBroadcast } from "@/lib/broadcast-store";
@@ -26,12 +41,19 @@ const LANGS = ["English", "Español", "Français", "العربية", "Português
 
 function stepIcon(k: RouteStep["icon"]) {
   const cls = "h-4 w-4";
-  return k === "start" ? <Flag className={cls} /> :
-    k === "turn" ? <ChevronsRight className={cls} /> :
-    k === "stairs" ? <ArrowUp className={cls} /> :
-    k === "elevator" ? <ArrowUpFromLine className={cls} /> :
-    k === "escalator" ? <ArrowUp className={cls} /> :
-    <MapPin className={cls} />;
+  return k === "start" ? (
+    <Flag className={cls} />
+  ) : k === "turn" ? (
+    <ChevronsRight className={cls} />
+  ) : k === "stairs" ? (
+    <ArrowUp className={cls} />
+  ) : k === "elevator" ? (
+    <ArrowUpFromLine className={cls} />
+  ) : k === "escalator" ? (
+    <ArrowUp className={cls} />
+  ) : (
+    <MapPin className={cls} />
+  );
 }
 
 export function FanPage() {
@@ -69,9 +91,13 @@ export function FanPage() {
       {/* Broadcast banner */}
       {showBroadcast && (
         <div className="sticky top-0 z-40 px-3 pt-3" aria-live="assertive" role="alert">
-          <div className={`glass overflow-hidden rounded-2xl bg-gradient-to-r ${bcColor} p-[1px] shadow-glow`}>
+          <div
+            className={`glass overflow-hidden rounded-2xl bg-gradient-to-r ${bcColor} p-[1px] shadow-glow`}
+          >
             <div className="flex items-start gap-3 rounded-2xl bg-white/95 p-3">
-              <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r ${bcColor} text-white`}>
+              <div
+                className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r ${bcColor} text-white`}
+              >
                 <Bell className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -113,7 +139,9 @@ export function FanPage() {
               className="bg-transparent text-white outline-none"
             >
               {LANGS.map((l) => (
-                <option key={l} className="text-foreground" value={l}>{l}</option>
+                <option key={l} className="text-foreground" value={l}>
+                  {l}
+                </option>
               ))}
             </select>
           </div>
@@ -148,9 +176,24 @@ export function FanPage() {
               Accessibility
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <Toggle label="Wheelchair" icon={<Accessibility className="h-4 w-4" />} on={wheelchair} onChange={setW} />
-              <Toggle label="Visual" icon={<Eye className="h-4 w-4" />} on={visual} onChange={setV} />
-              <Toggle label="Low-sensory" icon={<Volume2 className="h-4 w-4" />} on={lowSensory} onChange={setL} />
+              <Toggle
+                label="Wheelchair"
+                icon={<Accessibility className="h-4 w-4" />}
+                on={wheelchair}
+                onChange={setW}
+              />
+              <Toggle
+                label="Visual"
+                icon={<Eye className="h-4 w-4" />}
+                on={visual}
+                onChange={setV}
+              />
+              <Toggle
+                label="Low-sensory"
+                icon={<Volume2 className="h-4 w-4" />}
+                on={lowSensory}
+                onChange={setL}
+              />
             </div>
           </div>
 
@@ -162,7 +205,9 @@ export function FanPage() {
             {routeMut.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <>Get Route <ArrowRight className="h-4 w-4" /></>
+              <>
+                Get Route <ArrowRight className="h-4 w-4" />
+              </>
             )}
           </button>
         </div>
@@ -171,8 +216,18 @@ export function FanPage() {
         {routeMut.data && (
           <div className="mt-5 space-y-4" aria-live="polite" aria-atomic="true">
             <div className="grid grid-cols-2 gap-3">
-              <Metric icon={<Clock className="h-4 w-4" />} label="ETA" value={`${routeMut.data.etaMinutes} min`} tone="brand" />
-              <Metric icon={<Ruler className="h-4 w-4" />} label="Distance" value={`${routeMut.data.distanceM} m`} tone="cyan" />
+              <Metric
+                icon={<Clock className="h-4 w-4" />}
+                label="ETA"
+                value={`${routeMut.data.etaMinutes} min`}
+                tone="brand"
+              />
+              <Metric
+                icon={<Ruler className="h-4 w-4" />}
+                label="Distance"
+                value={`${routeMut.data.distanceM} m`}
+                tone="cyan"
+              />
             </div>
 
             <div className="rounded-3xl bg-white p-5 shadow-soft ring-1 ring-border">
@@ -200,7 +255,9 @@ export function FanPage() {
               </div>
               <ul className="space-y-1.5">
                 {routeMut.data.accessibilityNotes.map((n, i) => (
-                  <li key={i} className="text-sm text-foreground/80">• {n}</li>
+                  <li key={i} className="text-sm text-foreground/80">
+                    • {n}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -223,10 +280,17 @@ export function FanPage() {
 }
 
 function Field({
-  icon, label, value, onChange, placeholder,
+  icon,
+  label,
+  value,
+  onChange,
+  placeholder,
 }: {
-  icon: React.ReactNode; label: string; value: string;
-  onChange: (v: string) => void; placeholder?: string;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
 }) {
   return (
     <label className="block">
@@ -245,8 +309,16 @@ function Field({
 }
 
 function Toggle({
-  label, icon, on, onChange,
-}: { label: string; icon: React.ReactNode; on: boolean; onChange: (b: boolean) => void }) {
+  label,
+  icon,
+  on,
+  onChange,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  on: boolean;
+  onChange: (b: boolean) => void;
+}) {
   return (
     <button
       type="button"
@@ -264,12 +336,23 @@ function Toggle({
 }
 
 function Metric({
-  icon, label, value, tone,
-}: { icon: React.ReactNode; label: string; value: string; tone: "brand" | "cyan" }) {
+  icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  tone: "brand" | "cyan";
+}) {
   return (
     <div className="rounded-2xl bg-white p-4 shadow-soft ring-1 ring-border">
-      <div className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider ${tone === "brand" ? "text-brand" : "text-cyan"}`}>
-        {icon}{label}
+      <div
+        className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider ${tone === "brand" ? "text-brand" : "text-cyan"}`}
+      >
+        {icon}
+        {label}
       </div>
       <div className="mt-1 text-2xl font-extrabold">{value}</div>
     </div>

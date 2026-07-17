@@ -23,12 +23,12 @@ function Landing() {
         </div>
 
         <h1 className="mt-8 max-w-3xl text-5xl font-extrabold leading-[1.05] tracking-tight md:text-7xl">
-          Stadium ops and fan flow, <span className="text-gradient-brand">in one command deck.</span>
+          Stadium ops and fan flow,{" "}
+          <span className="text-gradient-brand">in one command deck.</span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
           Unified operations dashboard and mobile fan PWA — real-time crowd density, AI-triaged
-          incidents, accessible wayfinding, and instant multilingual broadcasts. Built for
-          MatchDay.
+          incidents, accessible wayfinding, and instant multilingual broadcasts. Built for MatchDay.
         </p>
 
         <div className="mt-10 grid gap-5 md:grid-cols-2">
@@ -52,7 +52,9 @@ function Landing() {
             </p>
             <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-brand">
               Enter Fan Mode
-              <span aria-hidden className="transition group-hover:translate-x-1">→</span>
+              <span aria-hidden className="transition group-hover:translate-x-1">
+                →
+              </span>
             </div>
           </Link>
 
@@ -71,19 +73,30 @@ function Landing() {
             </div>
             <h2 className="mt-6 text-2xl font-bold">Ops Command</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Live crowd map, AI incident triage, Kanban response workflow, one-tap broadcast center.
+              Live crowd map, AI incident triage, Kanban response workflow, one-tap broadcast
+              center.
             </p>
             <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-cyan">
               Enter Ops Mode
-              <span aria-hidden className="transition group-hover:translate-x-1">→</span>
+              <span aria-hidden className="transition group-hover:translate-x-1">
+                →
+              </span>
             </div>
           </Link>
         </div>
 
         <div className="mt-16 grid gap-4 md:grid-cols-3">
           {[
-            { icon: MapPin, title: "Accessible Routing", body: "Wheelchair, visual-assist and low-sensory paths." },
-            { icon: Activity, title: "Live Density", body: "Zone-by-zone occupancy with color-graded severity." },
+            {
+              icon: MapPin,
+              title: "Accessible Routing",
+              body: "Wheelchair, visual-assist and low-sensory paths.",
+            },
+            {
+              icon: Activity,
+              title: "Live Density",
+              body: "Zone-by-zone occupancy with color-graded severity.",
+            },
             { icon: Radio, title: "Instant Broadcast", body: "Ops → Fan PWA in under a second." },
           ].map((f) => (
             <div key={f.title} className="rounded-2xl bg-white p-5 shadow-soft ring-1 ring-border">

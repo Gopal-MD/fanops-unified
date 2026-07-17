@@ -57,7 +57,7 @@ export const useUserStore = create<UserStore>()(
           if (existing) {
             return {
               cart: state.cart.map((c) =>
-                c.id === item.id ? { ...c, quantity: c.quantity + item.quantity } : c
+                c.id === item.id ? { ...c, quantity: c.quantity + item.quantity } : c,
               ),
             };
           }
@@ -71,9 +71,10 @@ export const useUserStore = create<UserStore>()(
 
       updateCartQty: (itemId, qty) =>
         set((state) => ({
-          cart: qty <= 0
-            ? state.cart.filter((item) => item.id !== itemId)
-            : state.cart.map((item) => (item.id === itemId ? { ...item, quantity: qty } : item)),
+          cart:
+            qty <= 0
+              ? state.cart.filter((item) => item.id !== itemId)
+              : state.cart.map((item) => (item.id === itemId ? { ...item, quantity: qty } : item)),
         })),
 
       clearCart: () => set({ cart: [] }),
@@ -97,15 +98,13 @@ export const useUserStore = create<UserStore>()(
         cart: state.cart,
         orders: state.orders,
       }),
-    }
-  )
+    },
+  ),
 );
 
 // Selector helpers
 export const useUser = () => useUserStore((state) => state.user);
 export const useCart = () => useUserStore((state) => state.cart);
 export const useCartTotal = () =>
-  useUserStore((state) =>
-    state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  );
+  useUserStore((state) => state.cart.reduce((sum, item) => sum + item.price * item.quantity, 0));
 export const useOrders = () => useUserStore((state) => state.orders);

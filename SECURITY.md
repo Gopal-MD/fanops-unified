@@ -11,7 +11,7 @@ Only the latest main branch is currently supported for security updates.
 
 ## Reporting a Vulnerability
 
-We take the security of FanOps Unified seriously. If you find any security vulnerability, please do NOT report it publicly via issue reports or pull requests. 
+We take the security of FanOps Unified seriously. If you find any security vulnerability, please do NOT report it publicly via issue reports or pull requests.
 
 Instead, please send an email to security@fanops.dev.
 

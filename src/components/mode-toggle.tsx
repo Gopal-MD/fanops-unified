@@ -10,7 +10,9 @@ export function ModeToggle() {
         <Link
           to="/fan"
           className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition ${
-            fan ? "bg-gradient-brand text-white shadow-glow" : "text-foreground/70 hover:text-foreground"
+            fan
+              ? "bg-gradient-brand text-white shadow-glow"
+              : "text-foreground/70 hover:text-foreground"
           }`}
         >
           <Smartphone className="h-3.5 w-3.5" />

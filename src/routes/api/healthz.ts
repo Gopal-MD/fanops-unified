@@ -14,15 +14,18 @@ export const Route = createFileRoute("/api/healthz")({
             status: "OK",
             timestamp: new Date().toISOString(),
           };
-          
+
           // Guard clause: simple sanity check
           if (health.status !== "OK") {
             return createErrorResponse("Health check failed", 500);
           }
 
           return createSuccessResponse(health);
-        } catch (error: any) {
-          return createErrorResponse(error?.message || "Internal server error", 500);
+        } catch (error: unknown) {
+          return createErrorResponse(
+            error instanceof Error ? error.message : "Internal server error",
+            500,
+          );
         }
       },
     },

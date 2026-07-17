@@ -55,8 +55,13 @@ export const updateCrowdStatus = async (update: CrowdUpdate): Promise<CrowdStatu
   };
 
   try {
-    const { getFirestore } = await import("firebase-admin/firestore" as never) as
-      { getFirestore: () => { collection: (n: string) => { doc: (id: string) => { update: (d: Record<string, unknown>) => Promise<void> } } } };
+    const { getFirestore } = (await import("firebase-admin/firestore" as never)) as {
+      getFirestore: () => {
+        collection: (n: string) => {
+          doc: (id: string) => { update: (d: Record<string, unknown>) => Promise<void> };
+        };
+      };
+    };
     const db = getFirestore();
     await db.collection("sections").doc(sectionId).update({
       occupancy,
@@ -72,7 +77,7 @@ export const updateCrowdStatus = async (update: CrowdUpdate): Promise<CrowdStatu
   // Alert if critical
   if (densityLevel === "critical") {
     console.warn(
-      `[CrowdService] 🚨 CRITICAL density at section ${sectionId}: ${densityPercent}% (match ${matchId})`
+      `[CrowdService] 🚨 CRITICAL density at section ${sectionId}: ${densityPercent}% (match ${matchId})`,
     );
     // TODO: call alertStaff(matchId, sectionId, message) when backend is live
   }

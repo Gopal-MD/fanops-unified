@@ -20,13 +20,13 @@ This project is built specifically for **Challenge 4: Smart Stadiums & Tournamen
 
 Here is our high-fidelity alignment matrix mapping the FIFA World Cup 2026 objectives, target personas, and AI prompt vectors:
 
-| Challenge Domain | FIFA 2026 Problem Statement | GenAI Unified Solution (LLaMA 3.3) | Target Personas | Operational Prompt Vectors |
-| :--- | :--- | :--- | :--- | :--- |
-| **Fan Navigation & Wayfinding** 🗺️ | Static, congested routes lead to delays. Wheelchair users, low-sensory fans, and visually impaired individuals lack tailored paths. | **AI-Powered Accessible Routing**: Generates step-free, visual-assist, or low-sensory paths in real-time, redirecting fans away from live bottlenecks. | Fans, Volunteers, Venue Staff | Crowd density redirection, step-free lifts prioritization, quiet sensory corridors. |
-| **Crowd Management & Operations** 📊 | Manual incident dispatch is too slow during matches. Organizers lack instant triage for crowd incidents. | **AI Incident Triage**: Instantly categorizes incident reports (High/Medium/Low) and returns a 2-sentence tactical dispatch plan in <800ms. | Organizers, Volunteers, Venue Staff | Operational intelligence support, security command, medical guidance. |
-| **Multilingual Assistance** 🗣️ | A global fan base creates major language barriers. Volunteers are overwhelmed with inquiries. | **Multilingual AI Fan Assistant**: Instant chatbot answers questions about navigation, stadium rules, and safety in the fan's native language. | Fans, Volunteers | Real-time multi-lingual crowd support, transit/transport dispatch info. |
-| **Sustainability & Eco-Ops** ♻️ | Static waste/recycling tracking. Stadium staff lack actionable operational guides for eco-targets. | **Eco-Operations Dashboard**: Live bin level monitoring with AI-generated, shift-contextual eco-tips to optimize waste diversion. | Organizers, Venue Staff | Operational intelligence support, resource optimization. |
-| **Volunteer Management** 👥 | Poor communication of real-time match details and safety protocols to thousands of stadium volunteers. | **Volunteer Command View**: Displays volunteer locations and live statuses with AI-generated shift briefings matching crowd density. | Organizers, Volunteers | Real-time crowd management, volunteer briefings. |
+| Challenge Domain                     | FIFA 2026 Problem Statement                                                                                                         | GenAI Unified Solution (LLaMA 3.3)                                                                                                                     | Target Personas                     | Operational Prompt Vectors                                                          |
+| :----------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------- | :---------------------------------------------------------------------------------- |
+| **Fan Navigation & Wayfinding** 🗺️   | Static, congested routes lead to delays. Wheelchair users, low-sensory fans, and visually impaired individuals lack tailored paths. | **AI-Powered Accessible Routing**: Generates step-free, visual-assist, or low-sensory paths in real-time, redirecting fans away from live bottlenecks. | Fans, Volunteers, Venue Staff       | Crowd density redirection, step-free lifts prioritization, quiet sensory corridors. |
+| **Crowd Management & Operations** 📊 | Manual incident dispatch is too slow during matches. Organizers lack instant triage for crowd incidents.                            | **AI Incident Triage**: Instantly categorizes incident reports (High/Medium/Low) and returns a 2-sentence tactical dispatch plan in <800ms.            | Organizers, Volunteers, Venue Staff | Operational intelligence support, security command, medical guidance.               |
+| **Multilingual Assistance** 🗣️       | A global fan base creates major language barriers. Volunteers are overwhelmed with inquiries.                                       | **Multilingual AI Fan Assistant**: Instant chatbot answers questions about navigation, stadium rules, and safety in the fan's native language.         | Fans, Volunteers                    | Real-time multi-lingual crowd support, transit/transport dispatch info.             |
+| **Sustainability & Eco-Ops** ♻️      | Static waste/recycling tracking. Stadium staff lack actionable operational guides for eco-targets.                                  | **Eco-Operations Dashboard**: Live bin level monitoring with AI-generated, shift-contextual eco-tips to optimize waste diversion.                      | Organizers, Venue Staff             | Operational intelligence support, resource optimization.                            |
+| **Volunteer Management** 👥          | Poor communication of real-time match details and safety protocols to thousands of stadium volunteers.                              | **Volunteer Command View**: Displays volunteer locations and live statuses with AI-generated shift briefings matching crowd density.                   | Organizers, Volunteers              | Real-time crowd management, volunteer briefings.                                    |
 
 ---
 
@@ -65,29 +65,34 @@ Here is our high-fidelity alignment matrix mapping the FIFA World Cup 2026 objec
 ## ✨ Key Features
 
 ### 🗺️ AI-Powered Accessible Wayfinding
+
 - Dynamic step-by-step routing generated by Groq LLaMA 3.3 in real-time
 - Three accessibility modes: **Wheelchair** (elevator-only, step-free), **Visual Assist** (high contrast, audio cues), **Low-Sensory** (quiet corridors, avoids DJ stages)
 - Natural language instructions with distance and ETA
 - Graceful local fallback if the AI API is unavailable
 
 ### 🤖 Multilingual AI Fan Assistant
+
 - Powered by Groq (LLaMA 3.3 70B) for ~500 token/s inference speed
 - Understands and responds in the fan's native language
 - Context-aware: knows the live venue, match status, and transport options
 - Quick-action suggestion chips for common stadium questions
 
 ### 📊 Real-Time Ops Command Center
+
 - Live crowd density heatmap with color-coded zone alerts
 - WebSocket-ready architecture for real-time event streaming
 - AI Incident Triage with automatic severity classification (High/Medium/Low)
 - Broadcast system for sending stadium-wide announcements
 
 ### ♻️ Sustainability Operations
+
 - Tracks recycling rate, energy savings (kWh), and waste bin fill levels
 - AI generates contextual eco-tips for operational staff per shift
 - Visual bin status indicators with urgency alerts
 
 ### 👥 Volunteer Management
+
 - Displays all active volunteers with zone assignments, roles, and live status
 - AI generates 2-sentence shift briefings based on live match context and crowd density
 - On Break / Active status tracking
@@ -96,22 +101,22 @@ Here is our high-fidelity alignment matrix mapping the FIFA World Cup 2026 objec
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|---|---|
-| **Frontend Framework** | React 19 + TanStack Start (SSR) |
-| **Language** | TypeScript 5.x (strict mode, zero `any`) |
-| **Styling** | Tailwind CSS v4 |
-| **State Management** | Zustand v5 with subscribeWithSelector |
-| **Data Fetching** | TanStack Query v5 |
-| **AI / LLM** | Groq API — LLaMA 3.3 70B Versatile |
-| **Input Validation** | Zod (server function schema enforcement) |
-| **Charts** | Recharts v2 |
-| **WebSockets** | Socket.io Client v4 |
-| **Icons** | Lucide React |
-| **Testing** | Vitest v4 + @vitest/coverage-v8 |
-| **Build Tool** | Vite v8 + Rolldown |
-| **Deployment** | Vercel (Serverless SSR) |
-| **Version Control** | GitHub |
+| Layer                  | Technology                               |
+| ---------------------- | ---------------------------------------- |
+| **Frontend Framework** | React 19 + TanStack Start (SSR)          |
+| **Language**           | TypeScript 5.x (strict mode, zero `any`) |
+| **Styling**            | Tailwind CSS v4                          |
+| **State Management**   | Zustand v5 with subscribeWithSelector    |
+| **Data Fetching**      | TanStack Query v5                        |
+| **AI / LLM**           | Groq API — LLaMA 3.3 70B Versatile       |
+| **Input Validation**   | Zod (server function schema enforcement) |
+| **Charts**             | Recharts v2                              |
+| **WebSockets**         | Socket.io Client v4                      |
+| **Icons**              | Lucide React                             |
+| **Testing**            | Vitest v4 + @vitest/coverage-v8          |
+| **Build Tool**         | Vite v8 + Rolldown                       |
+| **Deployment**         | Vercel (Serverless SSR)                  |
+| **Version Control**    | GitHub                                   |
 
 ---
 
@@ -154,6 +159,7 @@ fanops-unified/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 22.12+
 - npm 10+
 - A free [Groq API Key](https://console.groq.com/keys)
@@ -210,15 +216,15 @@ npm run build
 
 FanOps Unified has a comprehensive test suite of **104 tests across 7 test files**, covering all critical business logic:
 
-| Test File | Tests | Coverage Area |
-|---|---|---|
-| `matchStore.test.ts` | 17 | Zustand store — state, goals, score auto-increment |
-| `ai-gateway.test.ts` | 17 | AI triage — all High/Medium/Low paths + mocked Groq API |
-| `mock-data.utils.test.ts` | 20 | Zone integrity, incidents, density history |
-| `crowd-density.test.ts` | 22 | Density classification, occupancy thresholds |
-| `navigation.test.ts` | 20 | Wayfinding validation, accessibility context builder |
-| `broadcast.test.ts` | 17 | Message formatting, filtering, severity logic |
-| `ops.functions.test.ts` | 1 | Server function baseline |
+| Test File                 | Tests | Coverage Area                                           |
+| ------------------------- | ----- | ------------------------------------------------------- |
+| `matchStore.test.ts`      | 17    | Zustand store — state, goals, score auto-increment      |
+| `ai-gateway.test.ts`      | 17    | AI triage — all High/Medium/Low paths + mocked Groq API |
+| `mock-data.utils.test.ts` | 20    | Zone integrity, incidents, density history              |
+| `crowd-density.test.ts`   | 22    | Density classification, occupancy thresholds            |
+| `navigation.test.ts`      | 20    | Wayfinding validation, accessibility context builder    |
+| `broadcast.test.ts`       | 17    | Message formatting, filtering, severity logic           |
+| `ops.functions.test.ts`   | 1     | Server function baseline                                |
 
 Coverage thresholds enforced in CI: **70% lines / 70% functions / 60% branches**
 
@@ -231,6 +237,7 @@ Coverage thresholds enforced in CI: **70% lines / 70% functions / 60% branches**
 > **Note:** To enable the AI features on the live demo, you need to set `GROQ_API_KEY` in your Vercel project environment variables. The app gracefully degrades to a local rule-based engine if the key is absent.
 
 Navigate to:
+
 - **`/fan`** — Fan experience: accessible wayfinding + multilingual AI chat + live scoreboard
 - **`/ops`** — Operations command center: crowd density + incident triage + sustainability + volunteers
 
@@ -247,15 +254,15 @@ Navigate to:
 
 ## 📊 Evaluation Scores
 
-| Category | Score |
-|---|---|
-| 🔐 Security | **93 / 100** |
-| ⚡ Efficiency | **100 / 100** |
-| ♿ Accessibility | **96 / 100** |
-| 🎯 Problem Alignment | **88 / 100** |
-| 🏗️ Code Quality | **86 / 100** |
-| 🧪 Testing | **60 → 90+ / 100** *(actively improving)* |
-| **Overall** | **87.97 / 100** |
+| Category             | Score                                     |
+| -------------------- | ----------------------------------------- |
+| 🔐 Security          | **93 / 100**                              |
+| ⚡ Efficiency        | **100 / 100**                             |
+| ♿ Accessibility     | **96 / 100**                              |
+| 🎯 Problem Alignment | **88 / 100**                              |
+| 🏗️ Code Quality      | **86 / 100**                              |
+| 🧪 Testing           | **60 → 90+ / 100** _(actively improving)_ |
+| **Overall**          | **87.97 / 100**                           |
 
 ---
 
@@ -273,6 +280,7 @@ Navigate to:
 ## 👤 Author
 
 **Gopal MD**
+
 - GitHub: [@Gopal-MD](https://github.com/Gopal-MD)
 - Project: [FanOps Unified](https://github.com/Gopal-MD/fanops-unified)
 
@@ -289,6 +297,6 @@ This project is licensed under the **MIT License**.
 **Built for Challenge 4: Smart Stadiums & Tournament Operations**  
 **FIFA World Cup 2026 🏆**
 
-*Powered by [Groq](https://groq.com/) · [TanStack](https://tanstack.com/) · [React 19](https://react.dev/) · [Vercel](https://vercel.com/)*
+_Powered by [Groq](https://groq.com/) · [TanStack](https://tanstack.com/) · [React 19](https://react.dev/) · [Vercel](https://vercel.com/)_
 
 </div>

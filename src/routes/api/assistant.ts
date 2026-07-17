@@ -12,7 +12,7 @@ const AssistantSchema = z.object({
  * Handles operations under /api/assistant.
  * Supports:
  * - POST /api/assistant -> Asks the Groq GenAI assistant with contextual data.
- * 
+ *
  * Personas: Fans, Volunteers.
  */
 export const Route = createFileRoute("/api/assistant")({
@@ -32,8 +32,11 @@ export const Route = createFileRoute("/api/assistant")({
           const result = await askGroqAssistant({ data: validated.data });
 
           return createSuccessResponse(result);
-        } catch (error: any) {
-          return createErrorResponse(error?.message || "Internal server error", 500);
+        } catch (error: unknown) {
+          return createErrorResponse(
+            error instanceof Error ? error.message : "Internal server error",
+            500,
+          );
         }
       },
     },

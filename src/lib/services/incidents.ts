@@ -32,8 +32,11 @@ export const reportIncident = async (input: IncidentInput): Promise<string> => {
   let db: unknown;
 
   try {
-    const { getFirestore } = await import("firebase-admin/firestore" as never) as
-      { getFirestore: () => { runTransaction: (fn: (t: unknown) => Promise<string>) => Promise<string> } };
+    const { getFirestore } = (await import("firebase-admin/firestore" as never)) as {
+      getFirestore: () => {
+        runTransaction: (fn: (t: unknown) => Promise<string>) => Promise<string>;
+      };
+    };
     db = getFirestore();
   } catch {
     // Firebase Admin not available — return mock ID
@@ -54,7 +57,7 @@ export const reportIncident = async (input: IncidentInput): Promise<string> => {
     };
 
     // 1. Create incident
-    const incidentRef = (firestore.collection("incidents").doc() as { id: string });
+    const incidentRef = firestore.collection("incidents").doc() as { id: string };
     t.set(incidentRef, {
       ...input,
       status: "open",
@@ -89,11 +92,16 @@ export const reportIncident = async (input: IncidentInput): Promise<string> => {
 export const resolveIncident = async (
   incidentId: string,
   resolution: string,
-  resolvedBy: string
+  resolvedBy: string,
 ): Promise<void> => {
   try {
-    const { getFirestore } = await import("firebase-admin/firestore" as never) as
-      { getFirestore: () => { collection: (name: string) => { doc: (id: string) => { update: (data: Record<string, unknown>) => Promise<void> } } } };
+    const { getFirestore } = (await import("firebase-admin/firestore" as never)) as {
+      getFirestore: () => {
+        collection: (name: string) => {
+          doc: (id: string) => { update: (data: Record<string, unknown>) => Promise<void> };
+        };
+      };
+    };
     const db = getFirestore();
     await db.collection("incidents").doc(incidentId).update({
       status: "resolved",

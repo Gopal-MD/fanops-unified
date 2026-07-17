@@ -17,7 +17,7 @@ export interface RouteResult {
 /**
  * Calculates a dynamic, AI-powered accessible route through the stadium.
  * Uses Groq LLaMA 3.3 for intelligent pathfinding based on accessibility constraints.
- * 
+ *
  * @param {string} data.start - The starting location (e.g., Gate A).
  * @param {string} data.destination - The destination (e.g., Section 101).
  * @param {boolean} data.wheelchair - Requires step-free access (elevators).
@@ -27,13 +27,15 @@ export interface RouteResult {
  */
 export const calculateRoute = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
-    return z.object({
-      start: z.string().max(100),
-      destination: z.string().max(100),
-      wheelchair: z.boolean(),
-      visualAssist: z.boolean(),
-      lowSensory: z.boolean(),
-    }).parse(data);
+    return z
+      .object({
+        start: z.string().max(100),
+        destination: z.string().max(100),
+        wheelchair: z.boolean(),
+        visualAssist: z.boolean(),
+        lowSensory: z.boolean(),
+      })
+      .parse(data);
   })
   .handler(async ({ data }): Promise<RouteResult> => {
     const { start, destination, wheelchair, visualAssist, lowSensory } = data;
@@ -43,7 +45,11 @@ export const calculateRoute = createServerFn({ method: "POST" })
     if (!key) {
       console.info("[calculateRoute] GROQ_API_KEY missing, using deterministic fallback.");
       const base: RouteStep[] = [
-        { instruction: `Exit ${start || "your location"} heading east`, distanceM: 40, icon: "start" },
+        {
+          instruction: `Exit ${start || "your location"} heading east`,
+          distanceM: 40,
+          icon: "start",
+        },
         { instruction: "Follow the main concourse", distanceM: 120, icon: "turn" },
         wheelchair
           ? { instruction: "Take the elevator up 1 level", distanceM: 15, icon: "elevator" }
@@ -58,13 +64,13 @@ export const calculateRoute = createServerFn({ method: "POST" })
       const distanceM = base.reduce((s, x) => s + x.distanceM, 0);
       const paceMps = wheelchair ? 0.9 : 1.35;
       const etaMinutes = Math.max(2, Math.round(distanceM / paceMps / 60));
-  
+
       const notes: string[] = [];
       if (wheelchair) notes.push("Step-free route selected. Elevators prioritized.");
       if (visualAssist) notes.push("Audio guidance & high-contrast signage available along route.");
       if (lowSensory) notes.push("Quiet corridor selected. Avoids Fan Zone and DJ stage.");
       if (!notes.length) notes.push("Standard route — fastest available path.");
-  
+
       return { etaMinutes, distanceM, steps: base, accessibilityNotes: notes };
     }
 
@@ -89,7 +95,7 @@ export const calculateRoute = createServerFn({ method: "POST" })
                 "Redirect traffic away from crowd bottlenecks and coordinate with transport dispatch if needed. " +
                 "Respond ONLY with valid JSON matching this schema: " +
                 '{"etaMinutes": number, "distanceM": number, "steps": [{"instruction": string, "distanceM": number, "icon": "start"|"turn"|"stairs"|"elevator"|"escalator"|"arrive"}], "accessibilityNotes": [string]}. ' +
-                "If wheelchair=true, prioritize elevators and step-free access. If lowSensory=true, suggest quieter corridors. Ensure realistic distances and times."
+                "If wheelchair=true, prioritize elevators and step-free access. If lowSensory=true, suggest quieter corridors. Ensure realistic distances and times.",
             },
             {
               role: "user",
@@ -106,7 +112,7 @@ export const calculateRoute = createServerFn({ method: "POST" })
       const json = await res.json();
       const content = json.choices?.[0]?.message?.content ?? "{}";
       const result = JSON.parse(content) as RouteResult;
-      
+
       // Safety defaults if AI hallucinates
       if (!result.steps || result.steps.length === 0) throw new Error("Invalid format");
       return result;
@@ -118,9 +124,9 @@ export const calculateRoute = createServerFn({ method: "POST" })
         distanceM: 200,
         steps: [
           { instruction: `Head towards ${destination}`, distanceM: 200, icon: "start" },
-          { instruction: `Arrive at ${destination}`, distanceM: 0, icon: "arrive" }
+          { instruction: `Arrive at ${destination}`, distanceM: 0, icon: "arrive" },
         ],
-        accessibilityNotes: ["AI routing unavailable. Standard direct path assumed."]
+        accessibilityNotes: ["AI routing unavailable. Standard direct path assumed."],
       };
     }
   });
@@ -131,9 +137,11 @@ export const calculateRoute = createServerFn({ method: "POST" })
  */
 export const triageIncident = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
-    return z.object({
-      report: z.string().max(2000), // Max 2k characters to prevent abuse
-    }).parse(data);
+    return z
+      .object({
+        report: z.string().max(2000), // Max 2k characters to prevent abuse
+      })
+      .parse(data);
   })
   .handler(async ({ data }) => {
     const { triageIncidentWithAI } = await import("./ai-gateway.server");
@@ -148,11 +156,13 @@ export const triageIncident = createServerFn({ method: "POST" })
  */
 export const askGroqAssistant = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
-    return z.object({
-      question: z.string().max(500), // Limit question length
-      context: z.string().max(1000),
-      lang: z.string().max(50).optional(),
-    }).parse(data);
+    return z
+      .object({
+        question: z.string().max(500), // Limit question length
+        context: z.string().max(1000),
+        lang: z.string().max(50).optional(),
+      })
+      .parse(data);
   })
   .handler(async ({ data }): Promise<{ answer: string }> => {
     const key = process.env.GROQ_API_KEY;
@@ -160,9 +170,8 @@ export const askGroqAssistant = createServerFn({ method: "POST" })
       return { answer: "AI assistant unavailable — GROQ_API_KEY not configured." };
     }
 
-    const languageInstruction = data.lang && data.lang !== "English" 
-      ? ` Please reply in ${data.lang}.` 
-      : "";
+    const languageInstruction =
+      data.lang && data.lang !== "English" ? ` Please reply in ${data.lang}.` : "";
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -182,7 +191,8 @@ export const askGroqAssistant = createServerFn({ method: "POST" })
               "Your persona is a helpful and professional Tournament Ambassador. " +
               "Provide quick, practical operational intelligence support to Fans, Organizers, Volunteers, and Venue Staff. " +
               "Cover questions about match info, navigation, accessibility, crowd density redirection, and transit/transport dispatch. " +
-              "Keep answers concise (1-2 sentences) and warm." + languageInstruction,
+              "Keep answers concise (1-2 sentences) and warm." +
+              languageInstruction,
           },
           {
             role: "user",
@@ -193,10 +203,13 @@ export const askGroqAssistant = createServerFn({ method: "POST" })
     });
 
     if (!res.ok) {
-      return { answer: "Sorry, I couldn't fetch an answer right now. Please ask a staff member for help." };
+      return {
+        answer: "Sorry, I couldn't fetch an answer right now. Please ask a staff member for help.",
+      };
     }
 
     const json = await res.json();
-    const answer = json.choices?.[0]?.message?.content?.trim() ?? "I'm not sure — please ask nearby staff.";
+    const answer =
+      json.choices?.[0]?.message?.content?.trim() ?? "I'm not sure — please ask nearby staff.";
     return { answer };
   });

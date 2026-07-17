@@ -26,7 +26,9 @@ export function BroadcastView() {
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="lg:col-span-2 rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
-        <div className="text-xs font-semibold uppercase tracking-widest text-brand">Broadcast Center</div>
+        <div className="text-xs font-semibold uppercase tracking-widest text-brand">
+          Broadcast Center
+        </div>
         <h3 className="text-lg font-bold">Push an alert to every Fan PWA</h3>
 
         <div className="mt-4">
@@ -41,7 +43,9 @@ export function BroadcastView() {
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-xs font-semibold text-muted-foreground">Severity</label>
+            <label className="mb-2 block text-xs font-semibold text-muted-foreground">
+              Severity
+            </label>
             <div className="flex gap-2">
               {(["info", "warning", "critical"] as const).map((s) => (
                 <button
@@ -63,7 +67,9 @@ export function BroadcastView() {
             </div>
           </div>
           <div>
-            <label className="mb-2 block text-xs font-semibold text-muted-foreground">Language</label>
+            <label className="mb-2 block text-xs font-semibold text-muted-foreground">
+              Language
+            </label>
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value)}
@@ -115,12 +121,22 @@ export function BroadcastView() {
           {list.map((b) => (
             <div key={b.id} className="rounded-2xl border border-border p-3">
               <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
-                <span className={
-                  b.severity === "critical" ? "text-danger"
-                  : b.severity === "warning" ? "text-warning" : "text-brand"
-                }>{b.severity}</span>
+                <span
+                  className={
+                    b.severity === "critical"
+                      ? "text-danger"
+                      : b.severity === "warning"
+                        ? "text-warning"
+                        : "text-brand"
+                  }
+                >
+                  {b.severity}
+                </span>
                 <span className="text-muted-foreground">
-                  {new Date(b.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(b.createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
               <div className="mt-1 text-sm font-semibold">{b.message}</div>

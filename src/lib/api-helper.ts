@@ -2,7 +2,7 @@
  * API Response contract wrapper.
  * Enforces the strict JSON schema: { success: boolean, data: T | null, error: string | null }
  */
-export interface APIContract<T = any> {
+export interface APIContract<T = unknown> {
   success: boolean;
   data: T | null;
   error: string | null;
@@ -10,7 +10,7 @@ export interface APIContract<T = any> {
 
 /**
  * Returns a standardized successful JSON Response.
- * 
+ *
  * @template T
  * @param {T} data - The payload data to return.
  * @param {number} [status=200] - HTTP status code.
@@ -30,7 +30,7 @@ export function createSuccessResponse<T>(data: T, status: number = 200): Respons
 
 /**
  * Returns a standardized error JSON Response.
- * 
+ *
  * @param {string} errorMessage - Description of the error.
  * @param {number} [status=500] - HTTP status code.
  * @returns {Response} Standardized Response object.

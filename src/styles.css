@@ -57,8 +57,8 @@
   --radius: 0.875rem;
 
   /* Slate/white base */
-  --background: oklch(0.985 0.005 260);   /* #F8FAFC-ish */
-  --foreground: oklch(0.22 0.04 265);     /* deep slate */
+  --background: oklch(0.985 0.005 260); /* #F8FAFC-ish */
+  --foreground: oklch(0.22 0.04 265); /* deep slate */
 
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.22 0.04 265);
@@ -84,17 +84,21 @@
   --ring: oklch(0.54 0.25 295);
 
   /* Brand palette */
-  --brand: oklch(0.54 0.25 295);        /* #7C3AED purple */
-  --brand-2: oklch(0.58 0.22 275);      /* #6366F1 indigo */
-  --cyan: oklch(0.75 0.15 210);         /* #06B6D4 cyan */
-  --success: oklch(0.72 0.17 160);      /* #10B981 */
-  --warning: oklch(0.78 0.17 75);       /* #F59E0B */
-  --danger: oklch(0.63 0.24 25);        /* #EF4444 */
+  --brand: oklch(0.54 0.25 295); /* #7C3AED purple */
+  --brand-2: oklch(0.58 0.22 275); /* #6366F1 indigo */
+  --cyan: oklch(0.75 0.15 210); /* #06B6D4 cyan */
+  --success: oklch(0.72 0.17 160); /* #10B981 */
+  --warning: oklch(0.78 0.17 75); /* #F59E0B */
+  --danger: oklch(0.63 0.24 25); /* #EF4444 */
 
   /* Gradients & shadows */
-  --gradient-brand: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
-  --gradient-brand-soft: linear-gradient(135deg, oklch(0.54 0.25 295 / 0.12), oklch(0.58 0.22 275 / 0.12));
-  --gradient-cyan: linear-gradient(135deg, #06B6D4 0%, #6366F1 100%);
+  --gradient-brand: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+  --gradient-brand-soft: linear-gradient(
+    135deg,
+    oklch(0.54 0.25 295 / 0.12),
+    oklch(0.58 0.22 275 / 0.12)
+  );
+  --gradient-cyan: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
   --shadow-glow: 0 20px 60px -20px oklch(0.54 0.25 295 / 0.45);
   --shadow-soft: 0 10px 40px -12px oklch(0.4 0.1 265 / 0.18);
 
@@ -144,13 +148,17 @@
   * {
     border-color: var(--color-border);
   }
-  html, body {
+  html,
+  body {
     font-family: var(--font-sans);
     background-color: var(--color-background);
     color: var(--color-foreground);
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }

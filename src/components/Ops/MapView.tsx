@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Users, TrendingUp, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { useOpsStore } from "@/store/opsStore";
-import { densityColor } from "@/lib/mock-data";
+import { densityColor, type Zone } from "@/lib/mock-data";
 import { KpiCard } from "./KpiCard";
 
 function Legend({ color, label }: { color: string; label: string }) {
@@ -13,7 +13,7 @@ function Legend({ color, label }: { color: string; label: string }) {
   );
 }
 
-function StadiumMap({ zones }: { zones: ReturnType<typeof useOpsStore>["zones"] }) {
+function StadiumMap({ zones }: { zones: Zone[] }) {
   return (
     <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-gradient-to-br from-[#EEF2FF] via-white to-[#ECFEFF] ring-1 ring-border">
       {/* Field */}
@@ -62,11 +62,11 @@ function StadiumMap({ zones }: { zones: ReturnType<typeof useOpsStore>["zones"] 
  */
 export function MapView() {
   const zones = useOpsStore((s) => s.zones);
-  
+
   const stats = useMemo(() => {
     // Guard Clause: avoid division by zero
     if (zones.length === 0) return { avg: 0, congested: 0, totalCap: 0, inside: 0 };
-    
+
     const avg = Math.round(zones.reduce((s, z) => s + z.occupancy, 0) / zones.length);
     const congested = zones.filter((z) => z.level === "high").length;
     const totalCap = zones.reduce((s, z) => s + z.capacity, 0);
@@ -77,17 +77,43 @@ export function MapView() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-4">
-        <KpiCard icon={<Users className="h-5 w-5" />} label="Attendance" value={stats.inside.toLocaleString()} sub={`of ${stats.totalCap.toLocaleString()} capacity`} tone="brand" />
-        <KpiCard icon={<TrendingUp className="h-5 w-5" />} label="Avg density" value={`${stats.avg}%`} sub="+4% last 10 min" tone="cyan" />
-        <KpiCard icon={<ShieldAlert className="h-5 w-5" />} label="Congested zones" value={String(stats.congested)} sub="Gate B, Section 205" tone="warning" />
-        <KpiCard icon={<CheckCircle2 className="h-5 w-5" />} label="Response SLA" value="98%" sub="under 90s dispatch" tone="success" />
+        <KpiCard
+          icon={<Users className="h-5 w-5" />}
+          label="Attendance"
+          value={stats.inside.toLocaleString()}
+          sub={`of ${stats.totalCap.toLocaleString()} capacity`}
+          tone="brand"
+        />
+        <KpiCard
+          icon={<TrendingUp className="h-5 w-5" />}
+          label="Avg density"
+          value={`${stats.avg}%`}
+          sub="+4% last 10 min"
+          tone="cyan"
+        />
+        <KpiCard
+          icon={<ShieldAlert className="h-5 w-5" />}
+          label="Congested zones"
+          value={String(stats.congested)}
+          sub="Gate B, Section 205"
+          tone="warning"
+        />
+        <KpiCard
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          label="Response SLA"
+          value="98%"
+          sub="under 90s dispatch"
+          tone="success"
+        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 relative overflow-hidden rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-widest text-brand">Stadium Map</div>
+              <div className="text-xs font-semibold uppercase tracking-widest text-brand">
+                Stadium Map
+              </div>
               <h3 className="text-lg font-bold">Live zone density</h3>
             </div>
             <div className="flex items-center gap-3 text-xs">
@@ -100,7 +126,9 @@ export function MapView() {
         </div>
 
         <div className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-border">
-          <div className="text-xs font-semibold uppercase tracking-widest text-brand">Zone breakdown</div>
+          <div className="text-xs font-semibold uppercase tracking-widest text-brand">
+            Zone breakdown
+          </div>
           <h3 className="text-lg font-bold">Occupancy</h3>
           <div className="mt-4 space-y-3">
             {zones.map((z) => {
@@ -109,7 +137,9 @@ export function MapView() {
                 <div key={z.id} className="rounded-2xl border border-border p-3">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-bold">{z.name}</div>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white ${c.bg}`}>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white ${c.bg}`}
+                    >
                       {c.label}
                     </span>
                   </div>

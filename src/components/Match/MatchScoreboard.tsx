@@ -1,6 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { Swords, Clock, Wifi, MessageCircle, MessageSquare, Loader2, Send } from "lucide-react";
-import { useMatchStore, useCurrentMatch, useMatchEvents, useIsLive, type MatchEvent } from "@/store/matchStore";
+import {
+  useMatchStore,
+  useCurrentMatch,
+  useMatchEvents,
+  useIsLive,
+  type MatchEvent,
+} from "@/store/matchStore";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useServerFn } from "@tanstack/react-start";
 import { askGroqAssistant } from "@/lib/ops.functions";
@@ -33,8 +39,12 @@ export function MatchScoreboard({ lang = "English" }: { lang?: string }) {
   useEffect(() => {
     const unsubGoal = subscribe("match:goal", (data) => addEvent(data as MatchEvent));
     const unsubCard = subscribe("match:card", (data) => addEvent(data as MatchEvent));
-    const unsubSub  = subscribe("match:substitution", (data) => addEvent(data as MatchEvent));
-    return () => { unsubGoal(); unsubCard(); unsubSub(); };
+    const unsubSub = subscribe("match:substitution", (data) => addEvent(data as MatchEvent));
+    return () => {
+      unsubGoal();
+      unsubCard();
+      unsubSub();
+    };
   }, [subscribe, addEvent]);
 
   if (!match) return null;
@@ -129,11 +139,17 @@ export function MatchScoreboard({ lang = "English" }: { lang?: string }) {
 /* ── Event Row ────────────────────────────────────────────────────────────── */
 function EventRow({ event }: { event: MatchEvent }) {
   const emoji =
-    event.type === "goal"         ? "⚽" :
-    event.type === "card"         ? "🟨" :
-    event.type === "substitution" ? "🔄" :
-    event.type === "halftime"     ? "🔔" :
-    event.type === "kickoff"      ? "🏁" : "⏱";
+    event.type === "goal"
+      ? "⚽"
+      : event.type === "card"
+        ? "🟨"
+        : event.type === "substitution"
+          ? "🔄"
+          : event.type === "halftime"
+            ? "🔔"
+            : event.type === "kickoff"
+              ? "🏁"
+              : "⏱";
   const teamColor = event.team === "home" ? "text-brand" : "text-danger";
   return (
     <div className="flex items-center gap-2 rounded-xl px-2 py-1 hover:bg-secondary/50">
@@ -142,7 +158,7 @@ function EventRow({ event }: { event: MatchEvent }) {
         {event.minute}&apos;
       </span>
       <span className={`flex-1 text-xs font-semibold ${teamColor}`}>
-        {event.player || (event.type.charAt(0).toUpperCase() + event.type.slice(1))}
+        {event.player || event.type.charAt(0).toUpperCase() + event.type.slice(1)}
       </span>
       <span className="text-[10px] capitalize text-muted-foreground">{event.team}</span>
     </div>
@@ -156,12 +172,15 @@ function AskGroqWidget({ venue, lang = "English" }: { venue: string; lang?: stri
   const [busy, setBusy] = useState(false);
   const askFn = useServerFn(askGroqAssistant);
 
-  const QUICK = useMemo(() => [
-    "Where's the nearest toilet?",
-    "When does the match end?",
-    "How do I get to MetLife Stadium by train?",
-    "Where is the shuttle bus pickup?",
-  ], []);
+  const QUICK = useMemo(
+    () => [
+      "Where's the nearest toilet?",
+      "When does the match end?",
+      "How do I get to MetLife Stadium by train?",
+      "Where is the shuttle bus pickup?",
+    ],
+    [],
+  );
 
   const ask = async (q: string) => {
     if (!q.trim() || busy) return;
@@ -184,7 +203,11 @@ function AskGroqWidget({ venue, lang = "English" }: { venue: string; lang?: stri
   };
 
   return (
-    <div className="mt-5 rounded-3xl bg-white p-5 shadow-glow ring-1 ring-black/5" role="region" aria-label="AI Fan Assistant">
+    <div
+      className="mt-5 rounded-3xl bg-white p-5 shadow-glow ring-1 ring-black/5"
+      role="region"
+      aria-label="AI Fan Assistant"
+    >
       <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand">
         <MessageSquare className="h-4 w-4" /> AI Assistant
       </div>
@@ -230,7 +253,9 @@ function AskGroqWidget({ venue, lang = "English" }: { venue: string; lang?: stri
           <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand">
             <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" /> AI Answer
           </div>
-          <div className="mt-2 text-sm font-medium text-foreground">{busy ? "Thinking..." : answer}</div>
+          <div className="mt-2 text-sm font-medium text-foreground">
+            {busy ? "Thinking..." : answer}
+          </div>
         </div>
       )}
     </div>

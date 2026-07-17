@@ -15,27 +15,70 @@ export interface TriageResult {
 // Rule-based local fallback (no API key required)
 // ─────────────────────────────────────────────────────────────────────────────
 const HIGH_KEYWORDS = [
-  "unconscious", "cardiac", "collapse", "collapsed", "heart attack",
-  "fire", "smoke", "explosion", "weapon", "knife", "gun", "bomb",
-  "suspicious", "unattended bag", "threat", "fight", "assault",
-  "medical emergency", "not breathing", "blood", "injury", "injured",
+  "unconscious",
+  "cardiac",
+  "collapse",
+  "collapsed",
+  "heart attack",
+  "fire",
+  "smoke",
+  "explosion",
+  "weapon",
+  "knife",
+  "gun",
+  "bomb",
+  "suspicious",
+  "unattended bag",
+  "threat",
+  "fight",
+  "assault",
+  "medical emergency",
+  "not breathing",
+  "blood",
+  "injury",
+  "injured",
 ];
 
 const MEDIUM_KEYWORDS = [
-  "lost child", "lost", "crowd", "congestion", "overcrowded",
-  "spill", "slip", "fall", "faint", "dizzy", "drunk",
-  "broken", "damage", "stuck", "trapped", "elevator",
-  "harassment", "argument", "confrontation",
+  "lost child",
+  "lost",
+  "crowd",
+  "congestion",
+  "overcrowded",
+  "spill",
+  "slip",
+  "fall",
+  "faint",
+  "dizzy",
+  "drunk",
+  "broken",
+  "damage",
+  "stuck",
+  "trapped",
+  "elevator",
+  "harassment",
+  "argument",
+  "confrontation",
 ];
 
 function buildActionPlan(text: string, priority: "High" | "Medium" | "Low"): string {
-  if (text.includes("unconscious") || text.includes("collapse") || text.includes("medical emergency") || text.includes("not breathing")) {
+  if (
+    text.includes("unconscious") ||
+    text.includes("collapse") ||
+    text.includes("medical emergency") ||
+    text.includes("not breathing")
+  ) {
     return "Dispatch first aid team and call emergency services immediately. Clear a 5-metre radius around the patient and guide paramedics from the nearest gate.";
   }
   if (text.includes("fire") || text.includes("smoke") || text.includes("explosion")) {
     return "Activate fire protocol — alert security lead and initiate evacuation of the affected zone. Contact the fire brigade and keep all exits clear.";
   }
-  if (text.includes("suspicious") || text.includes("unattended bag") || text.includes("weapon") || text.includes("bomb")) {
+  if (
+    text.includes("suspicious") ||
+    text.includes("unattended bag") ||
+    text.includes("weapon") ||
+    text.includes("bomb")
+  ) {
     return "Secure a 15-metre perimeter immediately and notify the K9 unit and security lead. Do not touch the item — await specialist clearance before resuming normal operations.";
   }
   if (text.includes("fight") || text.includes("assault") || text.includes("threat")) {
@@ -77,7 +120,7 @@ function localTriage(report: string): TriageResult {
 // Groq API call — OpenAI-compatible endpoint, ultra-fast LLaMA inference
 // ─────────────────────────────────────────────────────────────────────────────
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL   = "llama-3.3-70b-versatile"; // ~500 tok/s on Groq
+const GROQ_MODEL = "llama-3.3-70b-versatile"; // ~500 tok/s on Groq
 
 async function groqTriage(report: string, key: string): Promise<TriageResult> {
   const res = await fetch(GROQ_API_URL, {
@@ -123,8 +166,7 @@ async function groqTriage(report: string, key: string): Promise<TriageResult> {
       ? parsed.priority
       : "Medium") as TriageResult["priority"],
     actionPlan:
-      parsed.actionPlan ??
-      "Review incident and dispatch appropriate team to the location.",
+      parsed.actionPlan ?? "Review incident and dispatch appropriate team to the location.",
   };
 }
 
@@ -137,7 +179,7 @@ export async function triageIncidentWithAI(report: string): Promise<TriageResult
   if (!key) {
     console.info(
       "[AI Triage] GROQ_API_KEY not set — using local rule-based triage.\n" +
-      "            Get a free key at https://console.groq.com/keys and add it to .env"
+        "            Get a free key at https://console.groq.com/keys and add it to .env",
     );
     return localTriage(report);
   }
