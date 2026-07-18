@@ -94,6 +94,9 @@ interface AIAction {
   resource: string;
   eta: string;
   estimatedImpact: string;
+  confidence: number;
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  why: string;
   approved?: boolean;
 }
 
@@ -164,9 +167,9 @@ export function IncidentsView() {
           question: `Act as a Stadium AI Incident Commander. Provide a structured emergency plan for: "${description}". You MUST respond with a JSON array inside <PLAN> tags matching:
 <PLAN>
 [
-  {"action": "Move 20 volunteers from Gate 2 to Gate 5", "urgency": "immediate", "resource": "Volunteers", "eta": "3 min", "estimatedImpact": "Relieves crowd pressure by 40%"},
-  {"action": "Redirect arriving fans through Entrance C", "urgency": "immediate", "resource": "PA System", "eta": "1 min", "estimatedImpact": "Redirects ~500 fans/hour"},
-  {"action": "Increase shuttle frequency by 25%", "urgency": "urgent", "resource": "Shuttles", "eta": "10 min", "estimatedImpact": "Eases exit logistics"}
+  {"action": "Move 20 volunteers from Gate 2 to Gate 5", "urgency": "immediate", "resource": "Volunteers", "eta": "3 min", "estimatedImpact": "Relieves crowd pressure by 40%", "confidence": 91, "priority": "HIGH", "why": "Immediate local redirection keeps queue bottlenecks low."},
+  {"action": "Redirect arriving fans through Entrance C", "urgency": "immediate", "resource": "PA System", "eta": "1 min", "estimatedImpact": "Redirects ~500 fans/hour", "confidence": 88, "priority": "HIGH", "why": "Bypasses current gate overload before blockup."},
+  {"action": "Increase shuttle frequency by 25%", "urgency": "urgent", "resource": "Shuttles", "eta": "10 min", "estimatedImpact": "Eases exit logistics", "confidence": 95, "priority": "MEDIUM", "why": "Long-term congestion buffer."}
 ]
 </PLAN>
 Also output a 2-sentence reasoning explanation under a <REASONING> tag, and a risk level under <RISK> (e.g. HIGH, MEDIUM, LOW).`,
@@ -185,25 +188,34 @@ Also output a 2-sentence reasoning explanation under a <REASONING> tag, and a ri
         // Fallback mock structured plan to keep UI active
         setCommanderPlan([
           {
-            action: "Move 20 volunteers to target zone",
+            action: "Move 20 volunteers from Gate 2 to Gate 5",
             urgency: "immediate",
             resource: "Volunteers",
             eta: "3 min",
-            estimatedImpact: "Eases entry congestion by 40%",
+            estimatedImpact: "Eases queue wait times by 42%",
+            confidence: 91,
+            priority: "HIGH",
+            why: "Redistributing staff to the overload point provides local assistance.",
           },
           {
             action: "Redirect incoming transit lines to Lot C",
             urgency: "immediate",
             resource: "Transport team",
             eta: "5 min",
-            estimatedImpact: "Lowers parking bottlenecks",
+            estimatedImpact: "Reduces bottleneck gridlocks by 35%",
+            confidence: 88,
+            priority: "HIGH",
+            why: "Diverting inbound parking traffic prevents complete ingress lockup.",
           },
           {
             action: "Alert nearby medical squads",
             urgency: "urgent",
             resource: "Medical team",
             eta: "2 min",
-            estimatedImpact: "Prepares emergency backup support",
+            estimatedImpact: "Mitigates medical escalation rates",
+            confidence: 95,
+            priority: "HIGH",
+            why: "Early stand-by keeps response timers within safely acceptable SLAs.",
           },
         ]);
       }
@@ -300,41 +312,75 @@ Also output a 2-sentence reasoning explanation under a <REASONING> tag, and a ri
               </h4>
             </div>
 
-            <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="mt-3 grid gap-4 md:grid-cols-3">
               {commanderPlan.map((action, idx) => (
                 <div
                   key={idx}
-                  className={`rounded-2xl bg-white p-4 ring-1 ring-border ${
-                    action.approved ? "border-success bg-success-soft" : ""
+                  className={`rounded-2xl bg-white p-5 shadow-soft ring-1 ring-border flex flex-col justify-between transition hover:shadow-glow ${
+                    action.approved ? "ring-2 ring-success bg-success-soft" : ""
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase text-white ${
-                        action.urgency === "immediate" ? "bg-danger" : "bg-warning"
-                      }`}
+                  <div>
+                    {/* Header: Priority & Confidence */}
+                    <div className="flex items-center justify-between border-b border-secondary pb-2.5">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase text-white ${
+                          action.priority === "HIGH" ? "bg-danger" : "bg-warning"
+                        }`}
+                      >
+                        {action.priority} PRIORITY
+                      </span>
+                      <span className="text-[10px] font-bold text-brand">
+                        {action.confidence}% Confidence
+                      </span>
+                    </div>
+
+                    {/* Recommendation & Description */}
+                    <div className="mt-3">
+                      <div className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Recommendation
+                      </div>
+                      <p className="mt-1 text-xs font-bold text-foreground leading-snug">
+                        {action.action}
+                      </p>
+                    </div>
+
+                    {/* Improvement Metric Badge */}
+                    <div className="mt-3 flex items-center justify-between rounded-xl bg-secondary/30 px-3 py-2">
+                      <span className="text-[10px] font-semibold text-muted-foreground">Improvement</span>
+                      <span className="text-xs font-extrabold text-brand">{action.estimatedImpact}</span>
+                    </div>
+
+                    {/* AI Reasoning Why */}
+                    <div className="mt-3.5">
+                      <div className="text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                        Reasoning
+                      </div>
+                      <p className="mt-1 text-[11px] text-foreground/80 leading-relaxed italic">
+                        "{action.why}"
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-t border-secondary">
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-3">
+                      <span>Resource: {action.resource}</span>
+                      <span>ETA: {action.eta}</span>
+                    </div>
+                    <button
+                      onClick={() => approveAction(idx)}
+                      disabled={action.approved}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-brand px-3 py-2 text-xs font-bold text-white shadow-glow hover:brightness-105 disabled:opacity-60 transition"
                     >
-                      {action.urgency}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">ETA: {action.eta}</span>
+                      {action.approved ? (
+                        <>
+                          <CheckCircle className="h-3.5 w-3.5 text-white" /> Deployed
+                        </>
+                      ) : (
+                        "Approve & Deploy"
+                      )}
+                    </button>
                   </div>
-                  <div className="mt-2 text-xs font-bold">{action.action}</div>
-                  <div className="mt-1 text-[10px] text-muted-foreground">
-                    Impact: {action.estimatedImpact}
-                  </div>
-                  <button
-                    onClick={() => approveAction(idx)}
-                    disabled={action.approved}
-                    className="mt-3 flex w-full items-center justify-center gap-1 rounded-xl bg-secondary/80 py-1.5 text-[10px] font-bold hover:bg-brand hover:text-white transition"
-                  >
-                    {action.approved ? (
-                      <>
-                        <CheckCircle className="h-3 w-3 text-success" /> Approved
-                      </>
-                    ) : (
-                      "Approve & Deploy"
-                    )}
-                  </button>
                 </div>
               ))}
             </div>
