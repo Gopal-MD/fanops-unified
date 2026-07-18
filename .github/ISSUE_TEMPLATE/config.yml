@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "💬 FIFA World Cup 2026 Developer Discord"
+    url: "https://discord.gg/fifa-worldcup-devs"
+    about: "Ask questions, align on architectures, or discuss stadium operations."
+  - name: "🔒 Security Vulnerability"
+    url: "https://github.com/Gopal-MD/fanops-unified/security/advisories/new"
+    about: "Report security vulnerabilities safely using our security reporting system."

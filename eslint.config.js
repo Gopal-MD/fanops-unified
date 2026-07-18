@@ -4,11 +4,16 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 
 export default tseslint.config(
-  { ignores: ["dist", ".output", ".vinxi"] },
+  { ignores: ["dist", ".output", ".vinxi", "coverage"] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+      jsxA11y.flatConfigs.recommended,
+    ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
@@ -20,6 +25,9 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      "react-hooks/rules-of-hooks": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/explicit-function-return-type": "warn",
       "no-restricted-imports": [
         "error",
         {

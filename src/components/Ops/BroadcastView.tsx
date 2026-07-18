@@ -32,8 +32,14 @@ export function BroadcastView() {
         <h3 className="text-lg font-bold">Push an alert to every Fan PWA</h3>
 
         <div className="mt-4">
-          <label className="mb-2 block text-xs font-semibold text-muted-foreground">Message</label>
+          <label
+            htmlFor="broadcast-message"
+            className="mb-2 block text-xs font-semibold text-muted-foreground"
+          >
+            Message
+          </label>
           <textarea
+            id="broadcast-message"
             value={msg}
             onChange={(e) => setMsg(e.target.value)}
             rows={4}
@@ -43,10 +49,13 @@ export function BroadcastView() {
 
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <div>
-            <label className="mb-2 block text-xs font-semibold text-muted-foreground">
+            <span
+              id="severity-label"
+              className="mb-2 block text-xs font-semibold text-muted-foreground"
+            >
               Severity
-            </label>
-            <div className="flex gap-2">
+            </span>
+            <div className="flex gap-2" role="group" aria-labelledby="severity-label">
               {(["info", "warning", "critical"] as const).map((s) => (
                 <button
                   key={s}
@@ -67,10 +76,14 @@ export function BroadcastView() {
             </div>
           </div>
           <div>
-            <label className="mb-2 block text-xs font-semibold text-muted-foreground">
+            <label
+              htmlFor="broadcast-language"
+              className="mb-2 block text-xs font-semibold text-muted-foreground"
+            >
               Language
             </label>
             <select
+              id="broadcast-language"
               value={lang}
               onChange={(e) => setLang(e.target.value)}
               className="w-full rounded-xl border border-border bg-white px-3 py-2 text-sm font-semibold outline-none"
