@@ -50,13 +50,28 @@ export function SustainabilityView() {
     transit: 0.8,
   });
 
+  // Carbon Calculator state
+  const [calcDistance, setCalcDistance] = useState(25);
+  const [calcMode, setCalcMode] = useState<"car" | "ev" | "bus" | "metro">("car");
+
+  const co2Factors = {
+    car: 0.22, // kg CO2 per km
+    ev: 0.05,
+    bus: 0.08,
+    metro: 0.01,
+  };
+
+  const calculatedCO2 = Math.round(calcDistance * co2Factors[calcMode] * 10) / 10;
+  const carCO2Equivalent = Math.round(calcDistance * co2Factors.car * 10) / 10;
+  const carbonSaved = Math.round(Math.max(0, carCO2Equivalent - calculatedCO2) * 10) / 10;
+
   const generate = async () => {
     setLoading(true);
     try {
       const res = await askFn({
         data: {
           question:
-            "Give a 1-sentence quick operational tip to improve stadium sustainability right now during a live match.",
+            "Provide 3 actionable tips for stadium green operations: 1 for waste recycling bin optimization, 1 for water dispenser refill alerts, and 1 for energy-aware smart lighting options.",
           context: "Live match at MetLife Stadium.",
         },
       });
@@ -78,6 +93,14 @@ export function SustainabilityView() {
 
   return (
     <div className="space-y-6">
+      {/* Stakeholder Target Header Banner */}
+      <div className="rounded-2xl border border-brand/20 bg-gradient-brand-soft px-4 py-2.5 flex items-center justify-between text-xs text-brand font-bold">
+        <span>👥 Target Stakeholders: Sustainability Teams, Stadium Operations Managers</span>
+        <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+          <Leaf className="h-3.5 w-3.5 text-success animate-pulse" /> Eco-Commander Active
+        </span>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Sustainability Operations</h2>
@@ -85,8 +108,48 @@ export function SustainabilityView() {
             Monitor Carbon Impact and enforce live green mitigation decisions.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-1.5 text-sm font-semibold">
-          <Leaf className="h-4 w-4 text-success animate-pulse" /> Eco-Commander Active
+      </div>
+
+      {/* Interactive Carbon Calculator Widget */}
+      <div className="rounded-3xl border border-brand/10 bg-white p-5 shadow-soft">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+          <Leaf className="h-4.5 w-4.5 text-success" />
+          Interactive Transit Offset Calculator
+        </h3>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Estimate travel carbon footprint offsets based on fan transit choices.
+        </p>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-3 items-center">
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground">Distance (km)</label>
+            <input
+              type="number"
+              min="1"
+              max="200"
+              value={calcDistance}
+              onChange={(e) => setCalcDistance(Math.max(1, parseInt(e.target.value) || 0))}
+              className="mt-1 w-full rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-bold outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-black uppercase text-muted-foreground">Transport Mode</label>
+            <select
+              value={calcMode}
+              onChange={(e: any) => setCalcMode(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-bold"
+            >
+              <option value="car">Gasoline Car</option>
+              <option value="ev">Electric Vehicle</option>
+              <option value="bus">Shuttle Bus</option>
+              <option value="metro">Metro Transit</option>
+            </select>
+          </div>
+          <div className="rounded-2xl bg-gradient-brand-soft p-3 text-center border border-brand/5">
+            <div className="text-[9px] font-extrabold uppercase text-brand">Estimated Carbon Saved</div>
+            <div className="mt-1 text-base font-black text-brand">{carbonSaved} kg CO₂</div>
+            <div className="text-[8px] text-muted-foreground mt-0.5">compared to single occupancy car</div>
+          </div>
         </div>
       </div>
 

@@ -91,6 +91,14 @@ export function SchedulingView() {
 
   return (
     <div className="space-y-6">
+      {/* Stakeholder Target Header Banner */}
+      <div className="rounded-2xl border border-brand/20 bg-gradient-brand-soft px-4 py-2.5 flex items-center justify-between text-xs text-brand font-bold">
+        <span>👥 Target Stakeholders: Match Organizers, Tournament Operations Coordinators</span>
+        <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+          <Calendar className="h-3.5 w-3.5" /> Scheduling engine active
+        </span>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Tournament Scheduling Engine</h2>

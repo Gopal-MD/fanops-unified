@@ -107,8 +107,39 @@ export function VolunteerView() {
     { id: "v4", name: "Aisha T.", zone: "Concourse East", role: "Accessibility", status: "Active" },
   ];
 
+  // Volunteer Q&A states
+  const [qaQuery, setQaQuery] = useState("");
+  const [qaAnswer, setQaAnswer] = useState<string | null>(null);
+  const [qaLoading, setQaLoading] = useState(false);
+
+  const handleQaAsk = async () => {
+    if (!qaQuery.trim()) return;
+    setQaLoading(true);
+    try {
+      const res = await askFn({
+        data: {
+          question: `Act as the FIFA 2026 Volunteer Copilot. Provide a concise 2-sentence response for volunteer guide: "${qaQuery}"`,
+          context: "Live shift directory: " + JSON.stringify(volunteers),
+        },
+      });
+      setQaAnswer(res.answer);
+    } catch {
+      setQaAnswer("Error retrieving Copilot instructions. Check system network status.");
+    } finally {
+      setQaLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Stakeholder Target Header Banner */}
+      <div className="rounded-2xl border border-brand/20 bg-gradient-brand-soft px-4 py-2.5 flex items-center justify-between text-xs text-brand font-bold">
+        <span>👥 Target Stakeholders: Volunteers, Ushers, Shift Coordinators</span>
+        <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+          <Users className="h-3.5 w-3.5 animate-pulse" /> Volunteer Copilot Active
+        </span>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Volunteer Management</h2>
@@ -144,6 +175,49 @@ export function VolunteerView() {
             brief
           )}
         </div>
+      </div>
+
+      {/* Volunteer Copilot AI Q&A Terminal */}
+      <div className="rounded-3xl border border-brand/30 bg-gradient-brand-soft/40 p-6 shadow-soft">
+        <h3 className="text-sm font-black text-brand flex items-center gap-2 uppercase tracking-wide">
+          <Sparkles className="h-4.5 w-4.5 text-brand" />
+          Volunteer AI Copilot Q&A
+        </h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Ask the Copilot: "Where should I go?", "Nearest medical squad?", "Explain Section A accessibility assistance options?", etc.
+        </p>
+
+        <div className="mt-4 flex gap-2">
+          <input
+            placeholder="Type your Volunteer Copilot query here..."
+            value={qaQuery}
+            onChange={(e) => setQaQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleQaAsk()}
+            className="flex-1 rounded-xl border border-border bg-white px-4 py-2 text-sm outline-none shadow-sm"
+          />
+          <button
+            onClick={handleQaAsk}
+            disabled={qaLoading || !qaQuery.trim()}
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-5 py-2 text-sm font-bold text-white shadow-glow disabled:opacity-50"
+          >
+            {qaLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Ask Copilot"
+            )}
+          </button>
+        </div>
+
+        {qaAnswer && (
+          <div className="mt-4 rounded-2xl border border-brand/10 bg-white p-4">
+            <div className="text-[10px] font-black uppercase tracking-wider text-brand">
+              Copilot Response
+            </div>
+            <p className="mt-1 text-xs font-semibold text-foreground/80 leading-relaxed">
+              {qaAnswer}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Volunteer Task Copilot Queue */}

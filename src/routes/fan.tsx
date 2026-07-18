@@ -125,6 +125,14 @@ export function FanPage() {
       )}
 
       <div className="relative mx-auto max-w-md px-4 pt-6 pb-32 md:max-w-lg">
+        {/* Stakeholder Target Header Banner */}
+        <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-2.5 flex items-center justify-between text-xs text-white font-bold mb-4">
+          <span>👥 Target Stakeholders: Fans</span>
+          <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+            ♿ Accessible PWA Active
+          </span>
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between text-white">
           <div>
