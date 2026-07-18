@@ -1,6 +1,23 @@
-import { Map as MapIcon, Activity, AlertTriangle, Radio, Users, Sparkles } from "lucide-react";
+import {
+  Map as MapIcon,
+  Activity,
+  AlertTriangle,
+  Radio,
+  Users,
+  Sparkles,
+  Calendar,
+  Users2,
+} from "lucide-react";
 
-export type Tab = "map" | "density" | "incidents" | "broadcast" | "volunteers" | "sustainability";
+export type Tab =
+  | "map"
+  | "density"
+  | "incidents"
+  | "broadcast"
+  | "volunteers"
+  | "sustainability"
+  | "scheduling"
+  | "coordination";
 
 interface SidebarProps {
   tab: Tab;
@@ -15,6 +32,8 @@ export function Sidebar({ tab, setTab }: SidebarProps) {
     { id: "broadcast", label: "Broadcast", icon: Radio },
     { id: "volunteers", label: "Volunteers", icon: Users },
     { id: "sustainability", label: "Sustainability", icon: Sparkles },
+    { id: "scheduling", label: "Scheduling", icon: Calendar },
+    { id: "coordination", label: "Coordination", icon: Users2 },
   ];
 
   return (

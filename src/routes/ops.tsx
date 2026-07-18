@@ -12,6 +12,8 @@ import { IncidentsView } from "@/components/Ops/IncidentsView";
 import { BroadcastView } from "@/components/Ops/BroadcastView";
 import { VolunteerView } from "@/components/Ops/VolunteerView";
 import { SustainabilityView } from "@/components/Ops/SustainabilityView";
+import { SchedulingView } from "@/components/Ops/SchedulingView";
+import { CoordinationView } from "@/components/Ops/CoordinationView";
 import { Sidebar, type Tab } from "@/components/Ops/Sidebar";
 import { Topbar } from "@/components/Ops/Topbar";
 
@@ -66,6 +68,8 @@ export function OpsPage() {
           {tab === "broadcast" && <BroadcastView />}
           {tab === "volunteers" && <VolunteerView />}
           {tab === "sustainability" && <SustainabilityView />}
+          {tab === "scheduling" && <SchedulingView />}
+          {tab === "coordination" && <CoordinationView />}
         </main>
       </div>
       <ModeToggle />

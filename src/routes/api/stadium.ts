@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createSuccessResponse, createErrorResponse } from "@/lib/api-helper";
 import { z } from "zod";
-import { IncidentReportSchema } from "@/lib/validations/stadium";
+import {
+  CrowdDensityUpdateSchema,
+  IncidentReportV2Schema,
+  VolunteerDispatchSchema,
+} from "@/lib/validations/stadium";
 import { crowdDensityCache } from "@/lib/services/cache";
 
 // Zod schemas for input validation
@@ -23,9 +27,12 @@ const TriageSchema = z.object({
  * Supports:
  * - POST /api/stadium?action=route -> Calculates AI-powered accessible routing.
  * - POST /api/stadium?action=triage -> Triages incidents using AI.
+ * - POST /api/stadium?action=density_update -> Validates crowd density sensor payloads.
+ * - POST /api/stadium?action=report_incident -> Validates structured incident reports.
+ * - POST /api/stadium?action=volunteer_dispatch -> Validates volunteer dispatch tasks.
  * - GET /api/stadium?action=density -> Fetches crowd density mock metrics.
  *
- * Personas: Fans, Organizers, Volunteers, Venue Staff.
+ * Personas: Fans, Organizers, Volunteers, Security Command, Medical Teams, Venue Staff.
  */
 export const Route = createFileRoute("/api/stadium")({
   server: {
@@ -107,7 +114,6 @@ export const Route = createFileRoute("/api/stadium")({
             }
 
             const { calculateRoute } = await import("@/lib/ops.functions");
-            // Call the server function helper directly
             const result = await calculateRoute({ data: validated.data });
             return createSuccessResponse(result);
           }
@@ -126,6 +132,54 @@ export const Route = createFileRoute("/api/stadium")({
             const { triageIncident } = await import("@/lib/ops.functions");
             const result = await triageIncident({ data: validated.data });
             return createSuccessResponse(result);
+          }
+
+          // ── Crowd Density Update Action ────────────────────────────────
+          if (action === "density_update") {
+            const validated = CrowdDensityUpdateSchema.safeParse(body);
+            if (!validated.success) {
+              const firstError = validated.error.errors[0]?.message ?? "Invalid density payload";
+              return createErrorResponse(firstError, 400);
+            }
+
+            // Invalidate density cache on live sensor update
+            crowdDensityCache.delete("all_zones_density");
+
+            return createSuccessResponse({
+              data: validated.data,
+              receivedAt: new Date().toISOString(),
+            });
+          }
+
+          // ── Incident Report V2 Action ──────────────────────────────────
+          if (action === "report_incident") {
+            const validated = IncidentReportV2Schema.safeParse(body);
+            if (!validated.success) {
+              const firstError = validated.error.errors[0]?.message ?? "Invalid incident payload";
+              return createErrorResponse(firstError, 400);
+            }
+
+            // Invalidate density cache on reported incident
+            crowdDensityCache.delete("all_zones_density");
+
+            return createSuccessResponse({
+              data: validated.data,
+              receivedAt: new Date().toISOString(),
+            });
+          }
+
+          // ── Volunteer Dispatch Action ──────────────────────────────────
+          if (action === "volunteer_dispatch") {
+            const validated = VolunteerDispatchSchema.safeParse(body);
+            if (!validated.success) {
+              const firstError = validated.error.errors[0]?.message ?? "Invalid dispatch payload";
+              return createErrorResponse(firstError, 400);
+            }
+
+            return createSuccessResponse({
+              data: validated.data,
+              dispatchedAt: new Date().toISOString(),
+            });
           }
 
           // Guard Clause: fallthrough for invalid actions
