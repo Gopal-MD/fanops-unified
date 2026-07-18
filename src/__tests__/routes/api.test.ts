@@ -154,6 +154,74 @@ describe("RESTful API routes - JSON Contract & Error Boundaries", () => {
     });
   });
 
+  describe("POST /api/stadium?action=density_update", () => {
+    it("returns success on valid schema body", async () => {
+      const { Route } = await import("../../routes/api/stadium");
+      const request = new Request("http://localhost/api/stadium?action=density_update", {
+        method: "POST",
+        body: JSON.stringify({
+          stadiumZone: "MetLife-GateB",
+          currentCapacity: 75,
+          densityStatus: "HIGH",
+          flowRatePerMinute: 120,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      const response = await getHandlers(Route).POST({ request });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.success).toBe(true);
+      expect(body.data.data.stadiumZone).toBe("MetLife-GateB");
+    });
+
+    it("returns error on malformed capacity", async () => {
+      const { Route } = await import("../../routes/api/stadium");
+      const request = new Request("http://localhost/api/stadium?action=density_update", {
+        method: "POST",
+        body: JSON.stringify({
+          stadiumZone: "MetLife-GateB",
+          currentCapacity: 150,
+          densityStatus: "HIGH",
+          flowRatePerMinute: 120,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      const response = await getHandlers(Route).POST({ request });
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.success).toBe(false);
+      expect(body.error).toContain("Capacity percentage must be between 0 and 100");
+    });
+  });
+
+  describe("POST /api/stadium?action=report_incident", () => {
+    it("returns success on valid schema body", async () => {
+      const { Route } = await import("../../routes/api/stadium");
+      const request = new Request("http://localhost/api/stadium?action=report_incident", {
+        method: "POST",
+        body: JSON.stringify({
+          incidentId: "123e4567-e89b-12d3-a456-426614174000",
+          category: "CROWD_CONGESTION",
+          locationDescription: "Concourse near Gate A area",
+          severityLevel: "MAJOR",
+          reportedInLanguage: "en",
+          reportedAt: new Date().toISOString(),
+        }),
+      });
+
+      const response = await getHandlers(Route).POST({ request });
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.success).toBe(true);
+      expect(body.data.data.category).toBe("CROWD_CONGESTION");
+    });
+  });
+
   // ─── GenAI Assistant Route ─────────────────────────────────────────────────
   describe("POST /api/assistant", () => {
     it("returns assistant answer successfully conforming to contract", async () => {
