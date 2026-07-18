@@ -15,10 +15,10 @@ export const APP_CONSTANTS = {
       { id: "D", name: "Gate D (North Concourse)", cap: 12500 },
     ],
   },
-  
+
   REFRESH_INTERVALS: {
-    CROWD_DENSITY: 5000,   // 5 seconds
-    INCIDENT_POLL: 10000,  // 10 seconds
+    CROWD_DENSITY: 5000, // 5 seconds
+    INCIDENT_POLL: 10000, // 10 seconds
     BROADCAST_SYNC: 15000, // 15 seconds
   },
 

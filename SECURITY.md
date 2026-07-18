@@ -8,10 +8,10 @@ We take the security of FanOps Unified seriously. If you suspect or find a secur
 
 We actively provide security patches and updates for the following versions:
 
-| Version | Supported | Notes |
-| ------- | --------- | ----- |
+| Version | Supported | Notes                                   |
+| ------- | --------- | --------------------------------------- |
 | 1.x     | ✅ Yes    | Latest stable releases on `main` branch |
-| < 1.0   | ❌ No     | Pre-production versions and prototypes |
+| < 1.0   | ❌ No     | Pre-production versions and prototypes  |
 
 ---
 
@@ -20,7 +20,9 @@ We actively provide security patches and updates for the following versions:
 Please **do not** open public GitHub issues or pull requests for security vulnerabilities. Publicly disclosing a vulnerability makes it easier for bad actors to exploit it before a patch is available.
 
 ### Disclosure Process
+
 If you discover a vulnerability, please follow these steps:
+
 1. Document the vulnerability details, including the reproduction steps, affected endpoints (under `/api/`), and the potential impact.
 2. Send the report securely via email to **security@fanops.dev**.
 3. We will acknowledge receipt of your report within **24 to 48 hours**.
@@ -28,6 +30,7 @@ If you discover a vulnerability, please follow these steps:
 5. Once a security patch is deployed, we will publish a security advisory and credit you for the discovery.
 
 ### What to Include in a Report
+
 - **Impact Description**: A summary of the vulnerability (e.g., SQL injection, XSS, CSRF, privilege escalation).
 - **Reproduction Steps**: Detailed instructions, mock inputs, or curl commands to trigger the issue.
 - **Affected Components**: Specific files, routes, or store hooks.
@@ -38,6 +41,7 @@ If you discover a vulnerability, please follow these steps:
 ## 🚦 Vulnerability Severity Definitions
 
 We categorize vulnerabilities based on the CVSS v3.1 framework:
+
 - **Critical (9.0 - 10.0)**: Remote code execution, database compromise, or mass account hijack.
 - **High (7.0 - 8.9)**: Authentication bypass, unauthorized access to user PII, or data manipulation.
 - **Medium (4.0 - 6.9)**: Cross-Site Scripting (XSS), Cross-Site Request Forgery (CSRF), or server denial of service (DoS).
@@ -48,6 +52,7 @@ We categorize vulnerabilities based on the CVSS v3.1 framework:
 ## 🛡️ Automated Security Scanning
 
 We maintain repository hygiene through continuous, automated scanners:
+
 - **Trivy File Scan**: Runs on every push and weekly schedule (`security-scan.yml`) to check static assets and dependencies.
 - **GitHub CodeQL Analysis**: Integrated to catch SQL injections, memory leaks, and scripting vulnerabilities.
 - **Dependency Pinning**: All package versions are strictly pinned in `package.json` to prevent dependency hijack attacks.

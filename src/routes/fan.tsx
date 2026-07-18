@@ -68,7 +68,9 @@ export function FanPage() {
   const calc = useServerFn(calculateRoute);
   const routeMut = useMutation<RouteResult, Error, void>({
     mutationFn: () =>
-      calc({ data: { start, destination: dest, wheelchair, visualAssist: visual, lowSensory } }),
+      calc({
+        data: { start, destination: dest, wheelchair, visualAssist: visual, lowSensory, lang },
+      }),
   });
 
   const broadcast = useLatestBroadcast();

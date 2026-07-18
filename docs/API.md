@@ -15,11 +15,13 @@ All backend endpoints in FanOps Unified conform to the standardized JSON contrac
 ## 📡 1. Endpoints Reference
 
 ### A. System Health Probe
+
 Verify that the service is running.
 
-* **Endpoint**: `/api/healthz`
-* **Method**: `GET`
-* **Response**:
+- **Endpoint**: `/api/healthz`
+- **Method**: `GET`
+- **Response**:
+
 ```json
 {
   "success": true,
@@ -32,11 +34,13 @@ Verify that the service is running.
 ```
 
 ### B. System Metrics & Performance
+
 Provides live performance information about memory usage, active connections, and socket counts.
 
-* **Endpoint**: `/api/system`
-* **Method**: `GET`
-* **Response**:
+- **Endpoint**: `/api/system`
+- **Method**: `GET`
+- **Response**:
+
 ```json
 {
   "success": true,
@@ -54,14 +58,17 @@ Provides live performance information about memory usage, active connections, an
 ```
 
 ### C. Stadium Command Dispatcher
+
 Executes operations logic including incident triage, waypoint calculation, or density calculations.
 
-* **Endpoint**: `/api/stadium`
-* **Method**: `POST`
-* **Payload Examples**:
+- **Endpoint**: `/api/stadium`
+- **Method**: `POST`
+- **Payload Examples**:
 
 #### 1. Action: `triage`
+
 Triages reported incidents and produces a tactical action plan using LLaMA.
+
 ```json
 {
   "action": "triage",
@@ -74,23 +81,24 @@ Triages reported incidents and produces a tactical action plan using LLaMA.
   }
 }
 ```
-* **Response**:
+
+- **Response**:
+
 ```json
 {
   "success": true,
   "data": {
     "priority": "critical",
-    "actionPlan": [
-      "Deploy crowd barriers immediately.",
-      "Open manual inspection lanes 4 and 5."
-    ]
+    "actionPlan": ["Deploy crowd barriers immediately.", "Open manual inspection lanes 4 and 5."]
   },
   "error": null
 }
 ```
 
 #### 2. Action: `route`
+
 Calculates accessibility or sensory routing.
+
 ```json
 {
   "action": "route",

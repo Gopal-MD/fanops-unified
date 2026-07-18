@@ -24,15 +24,18 @@ graph TD
 Client-side state is managed using **Zustand** stores designed for extreme latency tolerance and offline-first usage during live matches:
 
 ### 1. Operations Store (`opsStore.ts`)
+
 - Manages real-time incident queues (reported, triaged, resolved).
 - Manages stadium zones layout status (Gate A, B, C, D) and congestion alerts.
 - **Hook selectors**: `useIncidents`, `useZones`, `useIncidentsByStatus`, `useCriticalZones`.
 
 ### 2. Match Scoreboard Store (`matchStore.ts`)
+
 - Manages active matches, live scoreboard updates (goals, cards, timers), and team stats.
 - **Hook selectors**: `useActiveMatch`, `useMatchStats`.
 
 ### 3. User Persona Store (`userStore.ts`)
+
 - Manages the selected user profile (Fan, Ops, Volunteer) and authentication profiles.
 - **Hook selectors**: `useUserProfile`, `useUserRole`.
 
@@ -41,6 +44,7 @@ Client-side state is managed using **Zustand** stores designed for extreme laten
 ## 🔄 Live Data Flow Diagrams
 
 ### 1. Incident Reporting and AI Triage Flow
+
 ```mermaid
 sequenceDiagram
   autonumber
@@ -68,14 +72,17 @@ sequenceDiagram
 All REST routes are under `src/routes/api/` and conform to the contract: `{ success: boolean, data: T | null, error: string | null }`.
 
 ### 1. System Health Endpoint (`/api/healthz`)
+
 - **Method**: `GET`
 - **Response**: Simple uptime and system checks.
 
 ### 2. System Performance Metrics (`/api/system`)
+
 - **Method**: `GET`
 - **Response**: Live server uptime, active memory usage, and socket client counts.
 
 ### 3. Stadium Action Dispatcher (`/api/stadium`)
+
 - **Method**: `POST`
 - **Actions**:
   - `triage`: Automatically triages an incident card using Groq AI LLaMA.
@@ -83,5 +90,6 @@ All REST routes are under `src/routes/api/` and conform to the contract: `{ succ
   - `density`: Refreshes zone load ratios.
 
 ### 4. Groq Assistant Interface (`/api/assistant`)
+
 - **Method**: `POST`
 - **Response**: Answers stadium operations questions using specialized personas.

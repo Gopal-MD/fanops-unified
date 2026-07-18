@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { findShortestPath, getLocalizedInstruction, STADIUM_ZONES } from "./routing";
 
 export interface RouteStep {
   instruction: string;
@@ -15,15 +16,8 @@ export interface RouteResult {
 }
 
 /**
- * Calculates a dynamic, AI-powered accessible route through the stadium.
- * Uses Groq LLaMA 3.3 for intelligent pathfinding based on accessibility constraints.
- *
- * @param {string} data.start - The starting location (e.g., Gate A).
- * @param {string} data.destination - The destination (e.g., Section 101).
- * @param {boolean} data.wheelchair - Requires step-free access (elevators).
- * @param {boolean} data.visualAssist - Requires high contrast/audio cues.
- * @param {boolean} data.lowSensory - Requires quiet, non-congested corridors.
- * @returns {Promise<RouteResult>} The calculated route steps and ETA.
+ * Calculates a dynamic, accessible route through the stadium.
+ * Runs Dijkstra's algorithm deterministically before using Groq LLaMA for phrasing.
  */
 export const calculateRoute = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
@@ -34,47 +28,86 @@ export const calculateRoute = createServerFn({ method: "POST" })
         wheelchair: z.boolean(),
         visualAssist: z.boolean(),
         lowSensory: z.boolean(),
+        lang: z.string().max(50).optional(),
       })
       .parse(data);
   })
   .handler(async ({ data }): Promise<RouteResult> => {
-    const { start, destination, wheelchair, visualAssist, lowSensory } = data;
+    const { start, destination, wheelchair, visualAssist, lowSensory, lang = "English" } = data;
     const key = process.env.GROQ_API_KEY;
 
-    // Fallback if no API key
+    // 1. Resolve path deterministically using Dijkstra rules engine
+    const resolvedRoute = findShortestPath(start, destination, { wheelchair, lowSensory });
+
+    if (!resolvedRoute) {
+      console.warn(`[routing] No route found from ${start} to ${destination}`);
+      return {
+        etaMinutes: 5,
+        distanceM: 0,
+        steps: [
+          { instruction: `Proceed directly to ${destination}.`, distanceM: 0, icon: "start" },
+        ],
+        accessibilityNotes: ["No route found matching accessibility constraints."],
+      };
+    }
+
+    // 2. Build local steps
+    const steps: RouteStep[] = resolvedRoute.path.map((edge, idx) => {
+      const isFinal = idx === resolvedRoute.path.length - 1;
+      const targetZone = STADIUM_ZONES[edge.to];
+      const name = targetZone.names[lang] || targetZone.names["English"] || edge.to;
+      const icon =
+        edge.means === "stairs"
+          ? "stairs"
+          : edge.means === "elevator"
+            ? "elevator"
+            : edge.means === "ramp"
+              ? "elevator"
+              : "turn";
+      return {
+        instruction: getLocalizedInstruction(edge, name, isFinal, lang),
+        distanceM: edge.distance,
+        icon,
+      };
+    });
+
+    // Calculate pace-based ETA
+    const paceMps = wheelchair ? 0.8 : 1.3;
+    const etaMinutes = Math.max(1, Math.round(resolvedRoute.totalDistance / paceMps / 60));
+
+    const notes: string[] = [];
+    if (wheelchair)
+      notes.push(
+        lang === "Español"
+          ? "Ruta sin escaleras seleccionada. Ascensores priorizados."
+          : "Step-free route selected. Elevators prioritized.",
+      );
+    if (visualAssist)
+      notes.push(
+        lang === "Español"
+          ? "Guía por audio disponible en el camino."
+          : "Audio guidance & high-contrast signage available along route.",
+      );
+    if (lowSensory)
+      notes.push(
+        lang === "Español"
+          ? "Ruta de bajo estímulo seleccionada."
+          : "Quiet corridor selected. Avoids busy food courts.",
+      );
+
+    // 3. Fallback to templates if Groq API key is absent
     if (!key) {
-      console.info("[calculateRoute] GROQ_API_KEY missing, using deterministic fallback.");
-      const base: RouteStep[] = [
-        {
-          instruction: `Exit ${start || "your location"} heading east`,
-          distanceM: 40,
-          icon: "start",
-        },
-        { instruction: "Follow the main concourse", distanceM: 120, icon: "turn" },
-        wheelchair
-          ? { instruction: "Take the elevator up 1 level", distanceM: 15, icon: "elevator" }
-          : { instruction: "Take the escalator up 1 level", distanceM: 20, icon: "escalator" },
-        { instruction: "Turn right past the merchandise stand", distanceM: 60, icon: "turn" },
-        {
-          instruction: `Arrive at ${destination || "your destination"}`,
-          distanceM: 25,
-          icon: "arrive",
-        },
-      ];
-      const distanceM = base.reduce((s, x) => s + x.distanceM, 0);
-      const paceMps = wheelchair ? 0.9 : 1.35;
-      const etaMinutes = Math.max(2, Math.round(distanceM / paceMps / 60));
-
-      const notes: string[] = [];
-      if (wheelchair) notes.push("Step-free route selected. Elevators prioritized.");
-      if (visualAssist) notes.push("Audio guidance & high-contrast signage available along route.");
-      if (lowSensory) notes.push("Quiet corridor selected. Avoids Fan Zone and DJ stage.");
-      if (!notes.length) notes.push("Standard route — fastest available path.");
-
-      return { etaMinutes, distanceM, steps: base, accessibilityNotes: notes };
+      console.info("[calculateRoute] GROQ_API_KEY missing. Returning deterministic path.");
+      return {
+        etaMinutes,
+        distanceM: resolvedRoute.totalDistance,
+        steps,
+        accessibilityNotes: notes,
+      };
     }
 
     try {
+      // 4. Grounded LLM phrasing
       const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -90,43 +123,38 @@ export const calculateRoute = createServerFn({ method: "POST" })
             {
               role: "system",
               content:
-                "You are the FIFA World Cup 2026 Stadium Navigation Engine, serving Fans, Volunteers, and Venue Staff. " +
-                "Generate a step-by-step route mapping starting point to destination under strict accessibility guidelines. " +
-                "Redirect traffic away from crowd bottlenecks and coordinate with transport dispatch if needed. " +
+                "You are the FIFA World Cup 2026 Stadium Navigation Phrasing AI. " +
+                "Phrase the route steps in natural language for the fan. " +
+                "Do NOT invent zones or facilities that are not in the input. " +
+                "Ensure the reply matches the requested language. " +
                 "Respond ONLY with valid JSON matching this schema: " +
-                '{"etaMinutes": number, "distanceM": number, "steps": [{"instruction": string, "distanceM": number, "icon": "start"|"turn"|"stairs"|"elevator"|"escalator"|"arrive"}], "accessibilityNotes": [string]}. ' +
-                "If wheelchair=true, prioritize elevators and step-free access. If lowSensory=true, suggest quieter corridors. Ensure realistic distances and times.",
+                '{"etaMinutes": number, "distanceM": number, "steps": [{"instruction": string, "distanceM": number, "icon": string}], "accessibilityNotes": [string]}.',
             },
             {
               role: "user",
-              content: `Start: ${start}. Destination: ${destination}. Wheelchair: ${wheelchair}. Visual Assist: ${visualAssist}. Low Sensory: ${lowSensory}.`,
+              content: `Language: ${lang}. Start: ${start}. Destination: ${destination}. Total Distance: ${resolvedRoute.totalDistance}m. ETA: ${etaMinutes} mins. Input Steps: ${JSON.stringify(steps)}. Accessibility Notes: ${JSON.stringify(notes)}.`,
             },
           ],
         }),
       });
 
       if (!res.ok) {
-        throw new Error("Failed to fetch route from Groq.");
+        throw new Error("Failed to phrase route from Groq.");
       }
 
       const json = await res.json();
       const content = json.choices?.[0]?.message?.content ?? "{}";
       const result = JSON.parse(content) as RouteResult;
 
-      // Safety defaults if AI hallucinates
       if (!result.steps || result.steps.length === 0) throw new Error("Invalid format");
       return result;
     } catch (e) {
-      console.error("[calculateRoute] AI route generation failed, falling back:", e);
-      // Simple fallback on error
+      console.error("[calculateRoute] AI route phrasing failed, returning deterministic steps:", e);
       return {
-        etaMinutes: 5,
-        distanceM: 200,
-        steps: [
-          { instruction: `Head towards ${destination}`, distanceM: 200, icon: "start" },
-          { instruction: `Arrive at ${destination}`, distanceM: 0, icon: "arrive" },
-        ],
-        accessibilityNotes: ["AI routing unavailable. Standard direct path assumed."],
+        etaMinutes,
+        distanceM: resolvedRoute.totalDistance,
+        steps,
+        accessibilityNotes: notes,
       };
     }
   });
