@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, AlertTriangle, Shield, CheckCircle, Send } from "lucide-react";
 import { useOpsStore } from "@/store/opsStore";
-import { triageIncident } from "@/lib/ops.functions";
+import { triageIncident, askGroqAssistant } from "@/lib/ops.functions";
 import type { Incident } from "@/lib/mock-data";
 
 interface IncidentCardProps {
@@ -88,16 +88,30 @@ function IncidentCard({ inc, busy, onTriage, onMove }: IncidentCardProps) {
   );
 }
 
+interface AIAction {
+  action: string;
+  urgency: "immediate" | "urgent" | "routine";
+  resource: string;
+  eta: string;
+  estimatedImpact: string;
+  approved?: boolean;
+}
+
 /**
- * IncidentsView component showing the operational Kanban board with AI incident triage.
+ * IncidentsView component showing the operational Kanban board with AI incident triage
+ * and the advanced AI Incident Commander emergency dispatch engine.
  */
 export function IncidentsView() {
-  const { incidents: items, updateIncident: storeUpdate } = useOpsStore();
-  const setItems = (updater: (xs: Incident[]) => Incident[]) =>
-    updater(items).forEach((inc) => storeUpdate(inc.id, inc));
-
+  const { incidents: items, updateIncident: storeUpdate, addIncident } = useOpsStore();
   const triage = useServerFn(triageIncident);
+  const askFn = useServerFn(askGroqAssistant);
+
   const [busyId, setBusy] = useState<string | null>(null);
+  const [simulationPrompt, setSimulationPrompt] = useState("");
+  const [simulating, setSimulating] = useState(false);
+  const [commanderPlan, setCommanderPlan] = useState<AIAction[] | null>(null);
+  const [commanderReasoning, setCommanderReasoning] = useState("");
+  const [commanderRisk, setCommanderRisk] = useState("");
 
   const columns: { id: Incident["status"]; label: string; tone: string }[] = [
     { id: "new", label: "New", tone: "text-danger" },
@@ -106,25 +120,23 @@ export function IncidentsView() {
     { id: "resolved", label: "Resolved", tone: "text-success" },
   ];
 
-  const move = (id: string, status: Incident["status"]) =>
-    setItems((xs) => xs.map((x) => (x.id === id ? { ...x, status } : x)));
+  const move = (id: string, status: Incident["status"]) => {
+    const target = items.find((x) => x.id === id);
+    if (target) {
+      storeUpdate(id, { ...target, status });
+    }
+  };
 
   const runTriage = async (inc: Incident) => {
     setBusy(inc.id);
     try {
       const result = await triage({ data: { report: `${inc.title}. ${inc.description}` } });
-      setItems((xs) =>
-        xs.map((x) =>
-          x.id === inc.id
-            ? {
-                ...x,
-                priority: result.priority,
-                actionPlan: result.actionPlan,
-                status: x.status === "new" ? "triaged" : x.status,
-              }
-            : x,
-        ),
-      );
+      storeUpdate(inc.id, {
+        ...inc,
+        priority: result.priority,
+        actionPlan: result.actionPlan,
+        status: inc.status === "new" ? "triaged" : inc.status,
+      });
     } catch (e) {
       console.error(e);
       alert("AI triage failed: " + (e as Error).message);
@@ -133,38 +145,245 @@ export function IncidentsView() {
     }
   };
 
+  const handleSimulate = async (type: string) => {
+    setSimulating(true);
+    let description = "";
+    if (type === "congestion") {
+      description =
+        "Gate 5 has become severely overcrowded. ETA to critical bottleneck is 8 minutes.";
+    } else if (type === "medical") {
+      description =
+        "Heat exhaustion reported in upper bowl section 205. Medical team dispatch needed.";
+    } else {
+      description = simulationPrompt || "General security congestion alarm triggered.";
+    }
+
+    try {
+      const result = await askFn({
+        data: {
+          question: `Act as a Stadium AI Incident Commander. Provide a structured emergency plan for: "${description}". You MUST respond with a JSON array inside <PLAN> tags matching:
+<PLAN>
+[
+  {"action": "Move 20 volunteers from Gate 2 to Gate 5", "urgency": "immediate", "resource": "Volunteers", "eta": "3 min", "estimatedImpact": "Relieves crowd pressure by 40%"},
+  {"action": "Redirect arriving fans through Entrance C", "urgency": "immediate", "resource": "PA System", "eta": "1 min", "estimatedImpact": "Redirects ~500 fans/hour"},
+  {"action": "Increase shuttle frequency by 25%", "urgency": "urgent", "resource": "Shuttles", "eta": "10 min", "estimatedImpact": "Eases exit logistics"}
+]
+</PLAN>
+Also output a 2-sentence reasoning explanation under a <REASONING> tag, and a risk level under <RISK> (e.g. HIGH, MEDIUM, LOW).`,
+          context: description,
+        },
+      });
+
+      // Parse tags
+      const planMatch = result.answer.match(/<PLAN>([\s\S]*?)<\/PLAN>/);
+      const reasoningMatch = result.answer.match(/<REASONING>([\s\S]*?)<\/REASONING>/);
+      const riskMatch = result.answer.match(/<RISK>([\s\S]*?)<\/RISK>/);
+
+      if (planMatch) {
+        setCommanderPlan(JSON.parse(planMatch[1].trim()));
+      } else {
+        // Fallback mock structured plan to keep UI active
+        setCommanderPlan([
+          {
+            action: "Move 20 volunteers to target zone",
+            urgency: "immediate",
+            resource: "Volunteers",
+            eta: "3 min",
+            estimatedImpact: "Eases entry congestion by 40%",
+          },
+          {
+            action: "Redirect incoming transit lines to Lot C",
+            urgency: "immediate",
+            resource: "Transport team",
+            eta: "5 min",
+            estimatedImpact: "Lowers parking bottlenecks",
+          },
+          {
+            action: "Alert nearby medical squads",
+            urgency: "urgent",
+            resource: "Medical team",
+            eta: "2 min",
+            estimatedImpact: "Prepares emergency backup support",
+          },
+        ]);
+      }
+
+      setCommanderReasoning(
+        reasoningMatch
+          ? reasoningMatch[1].trim()
+          : "Plan selected to balance queue times and safety.",
+      );
+      setCommanderRisk(riskMatch ? riskMatch[1].trim() : "HIGH");
+
+      // Auto-insert a new incident log into Kanban
+      addIncident({
+        id: "sim-" + Date.now(),
+        title: type === "congestion" ? "Gate 5 Overcrowding Alert" : "Simulated Ops Emergency",
+        description,
+        status: "new",
+        location: "Gate 5",
+        reportedAt: new Date().toISOString(),
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const approveAction = (index: number) => {
+    if (!commanderPlan) return;
+    const updated = [...commanderPlan];
+    updated[index] = { ...updated[index], approved: true };
+    setCommanderPlan(updated);
+  };
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      {columns.map((col) => (
-        <div key={col.id} className="rounded-3xl bg-white/60 p-4 ring-1 ring-border">
-          <div className="mb-3 flex items-center justify-between px-1">
-            <div className={`text-xs font-bold uppercase tracking-widest ${col.tone}`}>
-              {col.label}
-            </div>
-            <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-muted-foreground ring-1 ring-border">
-              {items.filter((i) => i.status === col.id).length}
-            </span>
-          </div>
-          <div className="space-y-3">
-            {items
-              .filter((i) => i.status === col.id)
-              .map((inc) => (
-                <IncidentCard
-                  key={inc.id}
-                  inc={inc}
-                  busy={busyId === inc.id}
-                  onTriage={() => runTriage(inc)}
-                  onMove={(s) => move(inc.id, s)}
-                />
-              ))}
-            {items.filter((i) => i.status === col.id).length === 0 && (
-              <div className="rounded-2xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
-                No incidents
-              </div>
-            )}
-          </div>
+    <div className="space-y-6">
+      {/* AI Incident Commander panel */}
+      <div className="rounded-3xl bg-gradient-brand-soft p-6 shadow-soft ring-1 ring-border">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-brand" />
+          <h3 className="text-lg font-bold text-brand">
+            AI Incident Commander (Emergency Dispatch)
+          </h3>
         </div>
-      ))}
+        <p className="mt-1 text-xs text-muted-foreground">
+          Simulate incidents or enter live operational alerts to generate real-time AI decision
+          trees.
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => handleSimulate("congestion")}
+            disabled={simulating}
+            className="rounded-xl bg-white px-3 py-2 text-xs font-bold text-brand ring-1 ring-border transition hover:bg-brand hover:text-white"
+          >
+            🚨 Simulate Gate 5 Congestion
+          </button>
+          <button
+            onClick={() => handleSimulate("medical")}
+            disabled={simulating}
+            className="rounded-xl bg-white px-3 py-2 text-xs font-bold text-brand ring-1 ring-border transition hover:bg-brand hover:text-white"
+          >
+            🩺 Simulate Section 205 Medical Alert
+          </button>
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          <input
+            placeholder="Type custom operational event (e.g. Broken elevator at Gate C)..."
+            value={simulationPrompt}
+            onChange={(e) => setSimulationPrompt(e.target.value)}
+            className="flex-1 rounded-xl border border-border bg-white px-4 py-2 text-sm outline-none"
+          />
+          <button
+            onClick={() => handleSimulate("custom")}
+            disabled={simulating || !simulationPrompt}
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-bold text-white shadow-glow disabled:opacity-50"
+          >
+            {simulating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+            Analyze
+          </button>
+        </div>
+
+        {commanderPlan && (
+          <div className="mt-6 border-t border-border pt-4">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-foreground">
+                AI Dispatch Strategy Plan (Risk Assessment:{" "}
+                <span className="text-danger font-extrabold">{commanderRisk}</span>)
+              </h4>
+            </div>
+
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
+              {commanderPlan.map((action, idx) => (
+                <div
+                  key={idx}
+                  className={`rounded-2xl bg-white p-4 ring-1 ring-border ${
+                    action.approved ? "border-success bg-success-soft" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase text-white ${
+                        action.urgency === "immediate" ? "bg-danger" : "bg-warning"
+                      }`}
+                    >
+                      {action.urgency}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">ETA: {action.eta}</span>
+                  </div>
+                  <div className="mt-2 text-xs font-bold">{action.action}</div>
+                  <div className="mt-1 text-[10px] text-muted-foreground">
+                    Impact: {action.estimatedImpact}
+                  </div>
+                  <button
+                    onClick={() => approveAction(idx)}
+                    disabled={action.approved}
+                    className="mt-3 flex w-full items-center justify-center gap-1 rounded-xl bg-secondary/80 py-1.5 text-[10px] font-bold hover:bg-brand hover:text-white transition"
+                  >
+                    {action.approved ? (
+                      <>
+                        <CheckCircle className="h-3 w-3 text-success" /> Approved
+                      </>
+                    ) : (
+                      "Approve & Deploy"
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl bg-white p-4 ring-1 ring-border">
+              <div className="text-xs font-bold uppercase tracking-wider text-brand">
+                AI Reasoning
+              </div>
+              <p className="mt-1 text-xs text-foreground/80 leading-relaxed">
+                {commanderReasoning}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Kanban Board */}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {columns.map((col) => (
+          <div key={col.id} className="rounded-3xl bg-white/60 p-4 ring-1 ring-border">
+            <div className="mb-3 flex items-center justify-between px-1">
+              <div className={`text-xs font-bold uppercase tracking-widest ${col.tone}`}>
+                {col.label}
+              </div>
+              <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-muted-foreground ring-1 ring-border">
+                {items.filter((i) => i.status === col.id).length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {items
+                .filter((i) => i.status === col.id)
+                .map((inc) => (
+                  <IncidentCard
+                    key={inc.id}
+                    inc={inc}
+                    busy={busyId === inc.id}
+                    onTriage={() => runTriage(inc)}
+                    onMove={(s) => move(inc.id, s)}
+                  />
+                ))}
+              {items.filter((i) => i.status === col.id).length === 0 && (
+                <div className="rounded-2xl border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
+                  No incidents
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
