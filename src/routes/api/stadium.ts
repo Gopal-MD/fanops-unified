@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createSuccessResponse, createErrorResponse } from "@/lib/api-helper";
 import { z } from "zod";
+import { IncidentReportSchema } from "@/lib/validations/stadium";
+import { crowdDensityCache } from "@/lib/services/cache";
 
 // Zod schemas for input validation
 const RouteSchema = z.object({
@@ -9,6 +11,7 @@ const RouteSchema = z.object({
   wheelchair: z.boolean().default(false),
   visualAssist: z.boolean().default(false),
   lowSensory: z.boolean().default(false),
+  lang: z.string().max(50).optional(),
 });
 
 const TriageSchema = z.object({
@@ -37,6 +40,14 @@ export const Route = createFileRoute("/api/stadium")({
             return createErrorResponse("Invalid action parameter for GET request", 400);
           }
 
+          // Caching Layer read
+          const cacheKey = "all_zones_density";
+          const cachedData = crowdDensityCache.get(cacheKey);
+          if (cachedData) {
+            console.info("[caching] Returning cached crowd density metrics");
+            return createSuccessResponse(cachedData);
+          }
+
           // Return high-fidelity mock crowd density data
           const densityData = {
             stadium: "MetLife Stadium (FIFA WC 2026)",
@@ -63,6 +74,9 @@ export const Route = createFileRoute("/api/stadium")({
             ],
             timestamp: new Date().toISOString(),
           };
+
+          // Cache write
+          crowdDensityCache.set(cacheKey, densityData);
 
           return createSuccessResponse(densityData);
         } catch (error: unknown) {
@@ -104,6 +118,10 @@ export const Route = createFileRoute("/api/stadium")({
             if (!validated.success) {
               return createErrorResponse("Invalid triage request body", 400);
             }
+
+            // Invalidate Caching Layer: clean density cache because of reported incidents
+            crowdDensityCache.delete("all_zones_density");
+            console.info("[caching] Invalided crowd density cache due to triage event");
 
             const { triageIncident } = await import("@/lib/ops.functions");
             const result = await triageIncident({ data: validated.data });
