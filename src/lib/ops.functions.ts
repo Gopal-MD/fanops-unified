@@ -125,6 +125,8 @@ export const calculateRoute = createServerFn({ method: "POST" })
               content:
                 "You are the FIFA World Cup 2026 Stadium Navigation Phrasing AI. " +
                 "Phrase the route steps in natural language for the fan. " +
+                "CRITICAL: You MUST output exactly the same number of steps as provided in the Input Steps. Do NOT combine or summarize steps. " +
+                "Translate or phrase each individual step into a helpful instruction. " +
                 "Do NOT invent zones or facilities that are not in the input. " +
                 "Ensure the reply matches the requested language. " +
                 "Respond ONLY with valid JSON matching this schema: " +
@@ -143,10 +145,28 @@ export const calculateRoute = createServerFn({ method: "POST" })
       }
 
       const json = await res.json();
-      const content = json.choices?.[0]?.message?.content ?? "{}";
+      let content = json.choices?.[0]?.message?.content ?? "{}";
+      
+      // Strip markdown code blocks if the LLM added them
+      content = content.replace(/^```json\s*/, "").replace(/^```\s*/, "").replace(/\s*```$/, "").trim();
+      
       const result = JSON.parse(content) as RouteResult;
 
       if (!result.steps || result.steps.length === 0) throw new Error("Invalid format");
+      
+      // Safety constraint: LLM must not hallucinate different number of steps
+      if (result.steps.length !== steps.length) {
+         console.warn("[routing] LLM changed step count. Falling back to deterministic steps.");
+         throw new Error("Step count mismatch");
+      }
+
+      // Enforce data integrity: use LLM phrasing, but retain deterministic distances and icons
+      result.steps = result.steps.map((aiStep, idx) => ({
+        instruction: aiStep.instruction || steps[idx].instruction,
+        distanceM: steps[idx].distanceM,
+        icon: steps[idx].icon
+      }));
+      
       return result;
     } catch (e) {
       console.error("[calculateRoute] AI route phrasing failed, returning deterministic steps:", e);
