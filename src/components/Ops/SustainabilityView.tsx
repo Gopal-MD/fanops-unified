@@ -122,33 +122,41 @@ export function SustainabilityView() {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3 items-center">
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground">Distance (km)</label>
-            <input
-              type="number"
-              min="1"
-              max="200"
-              value={calcDistance}
-              onChange={(e) => setCalcDistance(Math.max(1, parseInt(e.target.value) || 0))}
-              className="mt-1 w-full rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-bold outline-none"
-            />
+            <label className="text-[10px] font-black uppercase text-muted-foreground">
+              Distance (km)
+              <input
+                type="number"
+                min="1"
+                max="200"
+                value={calcDistance}
+                onChange={(e) => setCalcDistance(Math.max(1, parseInt(e.target.value) || 0))}
+                className="mt-1 w-full rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-bold outline-none"
+              />
+            </label>
           </div>
           <div>
-            <label className="text-[10px] font-black uppercase text-muted-foreground">Transport Mode</label>
-            <select
-              value={calcMode}
-              onChange={(e: any) => setCalcMode(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-bold"
-            >
-              <option value="car">Gasoline Car</option>
-              <option value="ev">Electric Vehicle</option>
-              <option value="bus">Shuttle Bus</option>
-              <option value="metro">Metro Transit</option>
-            </select>
+            <label className="text-[10px] font-black uppercase text-muted-foreground">
+              Transport Mode
+              <select
+                value={calcMode}
+                onChange={(e) => setCalcMode(e.target.value as "car" | "ev" | "bus" | "metro")}
+                className="mt-1 w-full rounded-xl border border-border bg-white px-3 py-1.5 text-xs font-bold"
+              >
+                <option value="car">Gasoline Car</option>
+                <option value="ev">Electric Vehicle</option>
+                <option value="bus">Shuttle Bus</option>
+                <option value="metro">Metro Transit</option>
+              </select>
+            </label>
           </div>
           <div className="rounded-2xl bg-gradient-brand-soft p-3 text-center border border-brand/5">
-            <div className="text-[9px] font-extrabold uppercase text-brand">Estimated Carbon Saved</div>
+            <div className="text-[9px] font-extrabold uppercase text-brand">
+              Estimated Carbon Saved
+            </div>
             <div className="mt-1 text-base font-black text-brand">{carbonSaved} kg CO₂</div>
-            <div className="text-[8px] text-muted-foreground mt-0.5">compared to single occupancy car</div>
+            <div className="text-[8px] text-muted-foreground mt-0.5">
+              compared to single occupancy car
+            </div>
           </div>
         </div>
       </div>

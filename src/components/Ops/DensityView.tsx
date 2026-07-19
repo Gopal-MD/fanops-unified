@@ -57,7 +57,8 @@ export function DensityView() {
       current: 55,
       predictions: { 15: 68, 30: 78, 60: 85 },
       status: "warning",
-      recommendation: "Activate auxiliary stalls at Corridor East and update digital signage directions.",
+      recommendation:
+        "Activate auxiliary stalls at Corridor East and update digital signage directions.",
       urgency: "medium",
       confidence: 84,
       why: "Section A seating is at 92% occupancy; restroom load historically peaks 15 minutes before halftime.",
@@ -121,7 +122,8 @@ export function DensityView() {
               <h2 className="text-lg font-bold">Organizer AI Dashboard (Predictive Operations)</h2>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Computer vision feeds and historical stadium models predict crowding bottlenecks up to 60 minutes in advance.
+              Computer vision feeds and historical stadium models predict crowding bottlenecks up to
+              60 minutes in advance.
             </p>
           </div>
           {/* Timeframe Selectors */}
@@ -206,7 +208,8 @@ export function DensityView() {
                   </div>
 
                   <div className="mt-1.5 flex items-center gap-1 text-[10px] text-muted-foreground">
-                    <TrendingUp className="h-3 w-3 text-brand" /> +{predVal - m.current}% surge predicted
+                    <TrendingUp className="h-3 w-3 text-brand" /> +{predVal - m.current}% surge
+                    predicted
                   </div>
 
                   {/* Recommendation block */}

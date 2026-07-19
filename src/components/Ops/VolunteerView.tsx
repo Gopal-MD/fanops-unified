@@ -184,7 +184,8 @@ export function VolunteerView() {
           Volunteer AI Copilot Q&A
         </h3>
         <p className="mt-1 text-xs text-muted-foreground">
-          Ask the Copilot: "Where should I go?", "Nearest medical squad?", "Explain Section A accessibility assistance options?", etc.
+          Ask the Copilot: "Where should I go?", "Nearest medical squad?", "Explain Section A
+          accessibility assistance options?", etc.
         </p>
 
         <div className="mt-4 flex gap-2">
@@ -200,11 +201,7 @@ export function VolunteerView() {
             disabled={qaLoading || !qaQuery.trim()}
             className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-5 py-2 text-sm font-bold text-white shadow-glow disabled:opacity-50"
           >
-            {qaLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Ask Copilot"
-            )}
+            {qaLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ask Copilot"}
           </button>
         </div>
 

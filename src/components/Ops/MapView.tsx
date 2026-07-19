@@ -78,7 +78,10 @@ export function MapView() {
     <div className="space-y-6">
       {/* Stakeholder Target Header Banner */}
       <div className="rounded-2xl border border-brand/20 bg-gradient-brand-soft px-4 py-2.5 flex items-center justify-between text-xs text-brand font-bold">
-        <span>👥 Target Stakeholders: Security Teams, Medical Staff, Transportation Teams, Stadium Operations Managers</span>
+        <span>
+          👥 Target Stakeholders: Security Teams, Medical Staff, Transportation Teams, Stadium
+          Operations Managers
+        </span>
         <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
           <Users className="h-3.5 w-3.5" /> Command Center Live
         </span>
@@ -122,26 +125,36 @@ export function MapView() {
           AI Stadium Digital Twin Explanation Console
         </h3>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Real-time AI digital twin status tracking across MetLife Stadium zones, gates, parking, restrooms, VIP boxes, and wheelchair access routes.
+          Real-time AI digital twin status tracking across MetLife Stadium zones, gates, parking,
+          restrooms, VIP boxes, and wheelchair access routes.
         </p>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           <div className="rounded-2xl bg-secondary/35 p-3.5 border border-border">
-            <div className="text-[10px] font-black uppercase text-brand">Accessible Wheelchair Routes</div>
+            <div className="text-[10px] font-black uppercase text-brand">
+              Accessible Wheelchair Routes
+            </div>
             <p className="mt-1 text-xs text-foreground/80 leading-relaxed">
-              Step-free lift conduits from Concourse East to Upper Section 205 are operational. Elevated ramp corridor at Gate A is clear.
+              Step-free lift conduits from Concourse East to Upper Section 205 are operational.
+              Elevated ramp corridor at Gate A is clear.
             </p>
           </div>
           <div className="rounded-2xl bg-secondary/35 p-3.5 border border-border">
-            <div className="text-[10px] font-black uppercase text-brand">Restroom & Food Stall Queues</div>
+            <div className="text-[10px] font-black uppercase text-brand">
+              Restroom & Food Stall Queues
+            </div>
             <p className="mt-1 text-xs text-foreground/80 leading-relaxed">
-              Food Court North congestion is high (84%). Restrooms at corridor East are experiencing normal load. Signage rerouting active.
+              Food Court North congestion is high (84%). Restrooms at corridor East are experiencing
+              normal load. Signage rerouting active.
             </p>
           </div>
           <div className="rounded-2xl bg-secondary/35 p-3.5 border border-border">
-            <div className="text-[10px] font-black uppercase text-brand">VIP Areas & Shuttle Access</div>
+            <div className="text-[10px] font-black uppercase text-brand">
+              VIP Areas & Shuttle Access
+            </div>
             <p className="mt-1 text-xs text-foreground/80 leading-relaxed">
-              VIP Gate B entrance flowing at normal capacity. Lot B parking occupies 94%; incoming shuttle lines successfully diverted to Lot C.
+              VIP Gate B entrance flowing at normal capacity. Lot B parking occupies 94%; incoming
+              shuttle lines successfully diverted to Lot C.
             </p>
           </div>
         </div>

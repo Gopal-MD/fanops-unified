@@ -254,7 +254,9 @@ Also output a 2-sentence reasoning explanation under a <REASONING> tag, and a ri
     <div className="space-y-6">
       {/* Stakeholder Target Header Banner */}
       <div className="rounded-2xl border border-brand/20 bg-gradient-brand-soft px-4 py-2.5 flex items-center justify-between text-xs text-brand font-bold">
-        <span>👥 Target Stakeholders: Security Teams, Medical Staff, Stadium Operations Managers</span>
+        <span>
+          👥 Target Stakeholders: Security Teams, Medical Staff, Stadium Operations Managers
+        </span>
         <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
           <Shield className="h-3.5 w-3.5 animate-pulse" /> Incident Command Live
         </span>
@@ -355,8 +357,12 @@ Also output a 2-sentence reasoning explanation under a <REASONING> tag, and a ri
 
                     {/* Improvement Metric Badge */}
                     <div className="mt-3 flex items-center justify-between rounded-xl bg-secondary/30 px-3 py-2">
-                      <span className="text-[10px] font-semibold text-muted-foreground">Improvement</span>
-                      <span className="text-xs font-extrabold text-brand">{action.estimatedImpact}</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground">
+                        Improvement
+                      </span>
+                      <span className="text-xs font-extrabold text-brand">
+                        {action.estimatedImpact}
+                      </span>
                     </div>
 
                     {/* AI Reasoning Why */}
