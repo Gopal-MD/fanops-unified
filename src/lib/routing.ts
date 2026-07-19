@@ -146,8 +146,29 @@ export function findShortestPath(
     lowSensory?: boolean;
   } = {},
 ): { path: Edge[]; totalDistance: number } | null {
-  if (!STADIUM_ZONES[start] || !STADIUM_ZONES[end]) return null;
-  if (start === end) return { path: [], totalDistance: 0 };
+  const resolveId = (input: string) => {
+    if (STADIUM_ZONES[input]) return input;
+    const lower = input.toLowerCase();
+    for (const key of Object.keys(STADIUM_ZONES)) {
+      const names = STADIUM_ZONES[key].names;
+      if (Object.values(names).some(n => n.toLowerCase().includes(lower))) return key;
+    }
+    if (lower.includes("gate a")) return "gA";
+    if (lower.includes("gate b")) return "gB";
+    if (lower.includes("gate c")) return "gC";
+    if (lower.includes("gate d")) return "gD";
+    if (lower.includes("food")) return "food";
+    if (lower.includes("conc")) return "conc";
+    if (lower.includes("101") || lower.includes("102")) return "s101"; // Fallback to 101 for nearby sections
+    if (lower.includes("205")) return "s205";
+    return null;
+  };
+
+  const startId = resolveId(start);
+  const endId = resolveId(end);
+
+  if (!startId || !endId) return null;
+  if (startId === endId) return { path: [], totalDistance: 0 };
 
   const { wheelchair, lowSensory } = options;
 
@@ -164,7 +185,7 @@ export function findShortestPath(
     unvisited.add(key);
   }
 
-  table[start].distance = 0;
+  table[startId].distance = 0;
 
   while (unvisited.size > 0) {
     // Find node with minimum distance
@@ -179,7 +200,7 @@ export function findShortestPath(
     }
 
     if (currentId === null || minDistance === Infinity) break;
-    if (currentId === end) break;
+    if (currentId === endId) break;
 
     unvisited.delete(currentId);
 
@@ -207,12 +228,12 @@ export function findShortestPath(
     }
   }
 
-  if (table[end].distance === Infinity) return null;
+  if (table[endId].distance === Infinity) return null;
 
   // Reconstruct path
   const path: Edge[] = [];
-  let curr = end;
-  while (curr !== start) {
+  let curr = endId;
+  while (curr !== startId) {
     const node = table[curr];
     if (!node.viaEdge || !node.previous) return null;
     path.unshift(node.viaEdge);
